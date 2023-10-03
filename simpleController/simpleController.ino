@@ -13,7 +13,7 @@ e(101): keyboard write 'Enter'
 
 k(107): key in a certain character (with one following ASCII code)
 */
-
+#include <Keyboard.h>
 #include <Mouse.h>
 long CLICK_FREQUENCY = 100;
 long MOVE_STEP = 30;  // 0 < MOVE_STEP < 128
@@ -22,6 +22,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   // Mouse.begin();
+  Keyboard.begin();
 }
 
 void loop() {
@@ -43,6 +44,13 @@ void loop() {
     } else if (c == 'd') {
       // Serial.println("[Command] double click");
       MultiClick(2, CLICK_FREQUENCY);
+
+    } else if (c == 'e') {
+      KeyStroke(13);
+
+    } else if (c == 'k') {
+      char key = (char)Serial.read();
+      KeyStroke(key);
 
     } else {
       Serial.print("[Error] Invalid command: ");
@@ -87,7 +95,7 @@ void Move(signed char x, signed char y) {
   Serial.print((int)y);
   Serial.println(")");
 
-  // Mouse.move(x, y);
+  Mouse.move(x, y);
 }
 
 void Click() {
@@ -101,6 +109,12 @@ void MultiClick(int times, long duration) {
     delay(duration);
   }
   Click();
+}
+
+void KeyStroke(char c) {
+  Serial.print("[Keyboard] key in ");
+  Serial.println((int)c);
+  Keyboard.write(c);
 }
 
 void CleanBuffer() {
