@@ -8,7 +8,7 @@ import (
 	"github.com/tarm/serial"
 )
 
-const DEVICE = "/dev/cu.usbmodem1301"
+const DEVICE = "/dev/cu.usbmodemHIDFG1"
 const BAUD = 9600
 const COMMAND_MAXLENGH = 16
 
@@ -23,16 +23,19 @@ func main() {
 	for {
 		// Get command from user
 		command := ""
-		_, err := fmt.Scanf("%s\n", &command)
+		_, err := fmt.Scan(&command)
 		if err != nil {
 			log.Fatal(err)
 		} else if len(command) > COMMAND_MAXLENGH {
 			color.Red("[Error] command is longer than %d bytes\n", COMMAND_MAXLENGH)
 			continue
+		} else if len(command) == 0 {
+			color.Red("[Error] empty command")
+			continue
 		}
-		color.Cyan("[User] command: %s\n", command)
 
 		// Send data to leonardo
+		color.Cyan("[User] command: %s\n", command)
 		_, err = leonardo.Write([]byte(command))
 		if err != nil {
 			log.Fatal(err)

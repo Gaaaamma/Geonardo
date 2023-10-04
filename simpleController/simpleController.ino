@@ -17,11 +17,12 @@ k(107): key in a certain character (with one following ASCII code)
 #include <Mouse.h>
 long CLICK_FREQUENCY = 100;
 long MOVE_STEP = 30;  // 0 < MOVE_STEP < 128
+const char ENTER = 13;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  // Mouse.begin();
+  Mouse.begin();
   Keyboard.begin();
 }
 
@@ -31,30 +32,33 @@ void loop() {
     char c = (char)Serial.read();
 
     if (c == 'm') {
-      // Serial.println("[Command] move");
+      Serial.print("[Command] move");
       long x = Serial.parseInt();
       Serial.read();  // consume ',' in the buffer
       long y = Serial.parseInt();
       LongMove(x, y);
 
     } else if (c == 's') {
-      // Serial.println("[Command] single click");
-      Click();
+      Serial.print("[Command] single click");
+      Click(MOUSE_LEFT);
 
     } else if (c == 'd') {
-      // Serial.println("[Command] double click");
-      MultiClick(2, CLICK_FREQUENCY);
+      Serial.print("[Command] double click");
+      MultiClick(2, CLICK_FREQUENCY, MOUSE_LEFT);
 
     } else if (c == 'e') {
-      KeyStroke(13);
+      Serial.print("[Command] key enter");
+      KeyStroke(ENTER);
 
     } else if (c == 'k') {
+      Serial.print("[Command] key something");
       char key = (char)Serial.read();
-      KeyStroke(key);
+      if (key != 0) {
+        KeyStroke(key);
+      }
 
     } else {
-      Serial.print("[Error] Invalid command: ");
-      Serial.println(c);
+      Serial.print("[Error] Invalid command");
     }
     CleanBuffer();
   }
@@ -89,31 +93,23 @@ void LongMove(long x, long y) {
 
 void Move(signed char x, signed char y) {
   // Must use a switch or some controller to keep it safe
-  Serial.print("[Mouse] moving (");
-  Serial.print((int)x);
-  Serial.print(",");
-  Serial.print((int)y);
-  Serial.println(")");
-
   Mouse.move(x, y);
 }
 
-void Click() {
+void Click(uint8_t b) {
   // Must use a switch or some controller to keep it safe
-  Serial.println("[Mouse] click");
+  Mouse.click(b);
 }
 
-void MultiClick(int times, long duration) {
+void MultiClick(int times, long duration, uint8_t b) {
   for (int i = 0; i < times - 1; i++) {
-    Click();
+    Click(b);
     delay(duration);
   }
-  Click();
+  Click(b);
 }
 
 void KeyStroke(char c) {
-  Serial.print("[Keyboard] key in ");
-  Serial.println((int)c);
   Keyboard.write(c);
 }
 
