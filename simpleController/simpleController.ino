@@ -30,8 +30,8 @@ const char ENTER = 13;
 int currentX = 0;
 int currentY = 0;
 
-const int MOVE_BOUND_MAX = 32767;
-const int MOVE_BOUND_MIN = -32767;
+const long MOVE_BOUND_MAX = 32767;
+const long MOVE_BOUND_MIN = -32767;
 
 
 /*               HID AbsoluteMouse coordination 
@@ -56,18 +56,21 @@ void loop() {
     char c = (char)Serial.read();
 
     if (c == 'm') {  // Move to a specific position (x, y)
-      int x = Serial.parseInt();
+      long x = Serial.parseInt();
       Serial.read();  // consume ',' in the buffer
-      int y = Serial.parseInt();
+      long y = Serial.parseInt();
 
       // Check valid movement
       if ((x <= MOVE_BOUND_MAX && x >= MOVE_BOUND_MIN) && (y <= MOVE_BOUND_MAX && y >= MOVE_BOUND_MIN)) {
         Serial.println("[Command] move");
-        AbsoluteMouse.moveTo(x, y);
-        updateLocation(x, y);
+        AbsoluteMouse.moveTo((int)x, (int)y);
+        updateLocation((int)x, (int)y);
+      } else {
+        Serial.println("[Error] invalid move");
       }
 
     } else if (c == 'c') {  // Move to the center of the screen
+      Serial.println("[Command] center");
       AbsoluteMouse.moveTo(0, 0);
       updateLocation(0, 0);
 
@@ -104,11 +107,12 @@ void loop() {
 }
 
 void SafeMove(signed char x, signed char y) {
-  Serial.print("[Safe Mouse] move (");
-  Serial.print((int)x);
-  Serial.print(",");
-  Serial.print((int)y);
-  Serial.println(")");
+  String message = "[Safe Move] move (";
+  message += String(x);
+  message += ",";
+  message += String(y);
+  message += ")";
+  Serial.println(message);
 }
 
 void MoveLikeHuman(int targetX, int targetY) {
@@ -142,9 +146,10 @@ void updateLocation(int x, int y) {
 }
 
 void getLocation() {
-  Serial.print("[Location] cursor (");
-  Serial.print(currentX);
-  Serial.print(",");
-  Serial.print(currentY);
-  Serial.println(")");
+  String message = "[Location] cursor(";
+  message += String(currentX);
+  message += ",";
+  message += String(currentY);
+  message += ")";
+  Serial.println(message);
 }
