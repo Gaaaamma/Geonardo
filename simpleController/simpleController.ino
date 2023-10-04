@@ -9,6 +9,10 @@ m(109): move mouse position (with two following integer separated by ',' end wit
   - y: relative y moving
   - Example: m240,31\n, m-243,-43.
 
+c(99): move mouse position to center (0,0)
+
+g(103): get current cursor position (x,y)
+
 e(101): keyboard write 'Enter'
 
 k(107): key in a certain character (with one following ASCII code)
@@ -21,8 +25,24 @@ l(108): l means lab is for experiment => MoveLikeHuman(long x, long y)
 #include "HID-Project.h"
 
 long CLICK_FREQUENCY = 100;
-long MOVE_STEP = 120;  // 0 < MOVE_STEP < 128
 const char ENTER = 13;
+
+int currentX = 0;
+int currentY = 0;
+
+const int MOVE_BOUND_MAX = 32767;
+const int MOVE_BOUND_MIN = -32767;
+
+
+/*               HID AbsoluteMouse coordination 
+(-32767, -32767) ------------- # ------------- (32767, -32767)
+                 |             |             |
+                 |             |             |
+                 |------------ 0 ------------| (32767, 0)
+                 |             |             |
+                 |             |             |
+(-32767, 32767)  ------------- # ------------- (32767, 32767)
+*/
 
 void setup() {
   // put your setup code here, to run once:
@@ -35,15 +55,24 @@ void loop() {
     // Start with a command character
     char c = (char)Serial.read();
 
-    if (c == 'm') { // Move to a specific position (x, y)
-      Serial.println("[Command] move");
-      long x = Serial.parseInt();
+    if (c == 'm') {  // Move to a specific position (x, y)
+      int x = Serial.parseInt();
       Serial.read();  // consume ',' in the buffer
-      long y = Serial.parseInt();
-      AbsoluteMouse.moveTo(x, y);
+      int y = Serial.parseInt();
 
-    } else if (c == 'c') { // Move to the center of the screen
+      // Check valid movement
+      if ((x <= MOVE_BOUND_MAX && x >= MOVE_BOUND_MIN) && (y <= MOVE_BOUND_MAX && y >= MOVE_BOUND_MIN)) {
+        Serial.println("[Command] move");
+        AbsoluteMouse.moveTo(x, y);
+        updateLocation(x, y);
+      }
+
+    } else if (c == 'c') {  // Move to the center of the screen
       AbsoluteMouse.moveTo(0, 0);
+      updateLocation(0, 0);
+
+    } else if (c == 'g') {  // Get current location
+      getLocation();
 
     } else if (c == 's') {
       Serial.println("[Command] single click");
@@ -82,6 +111,9 @@ void SafeMove(signed char x, signed char y) {
   Serial.println(")");
 }
 
+void MoveLikeHuman(int targetX, int targetY) {
+}
+
 void Click(uint8_t b) {
   // Must use a switch or some controller to keep it safe
   AbsoluteMouse.click(b);
@@ -102,4 +134,17 @@ void KeyStroke(char c) {
 void CleanBuffer() {
   while (Serial.read() != -1) {
   }
+}
+
+void updateLocation(int x, int y) {
+  currentX = x;
+  currentY = y;
+}
+
+void getLocation() {
+  Serial.print("[Location] cursor (");
+  Serial.print(currentX);
+  Serial.print(",");
+  Serial.print(currentY);
+  Serial.println(")");
 }
