@@ -26,39 +26,39 @@ void setup() {
   Keyboard.begin();
 }
 
-void loop() {
+void loop() {  
   if (Serial.available() > 0) {
     // Start with a command character
     char c = (char)Serial.read();
 
     if (c == 'm') {
-      Serial.print("[Command] move");
+      Serial.println("[Command] move");
       long x = Serial.parseInt();
       Serial.read();  // consume ',' in the buffer
       long y = Serial.parseInt();
       LongMove(x, y);
 
     } else if (c == 's') {
-      Serial.print("[Command] single click");
+      Serial.println("[Command] single click");
       Click(MOUSE_LEFT);
 
     } else if (c == 'd') {
-      Serial.print("[Command] double click");
+      Serial.println("[Command] double click");
       MultiClick(2, CLICK_FREQUENCY, MOUSE_LEFT);
 
     } else if (c == 'e') {
-      Serial.print("[Command] key enter");
+      Serial.println("[Command] key enter");
       KeyStroke(ENTER);
 
     } else if (c == 'k') {
-      Serial.print("[Command] key something");
+      Serial.println("[Command] key something");
       char key = (char)Serial.read();
       if (key != 0) {
         KeyStroke(key);
       }
 
     } else {
-      Serial.print("[Error] Invalid command");
+      Serial.println("[Error] Invalid command");
     }
     CleanBuffer();
   }
@@ -89,6 +89,11 @@ void LongMove(long x, long y) {
   if (yRemain != 0) {
     Move(0, (signed char)yRemain);
   }
+}
+
+void MoveLikeHuman(long x, long y) {
+  float ratio = (float)x / (float) y;
+  Serial.println(ratio);
 }
 
 void Move(signed char x, signed char y) {
