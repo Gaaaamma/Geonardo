@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
@@ -8,12 +9,15 @@ import (
 	"github.com/tarm/serial"
 )
 
-const DEVICE = "/dev/cu.usbmodemHIDFG1"
-const BAUD = 9600
 const COMMAND_MAXLENGH = 16
 
 func main() {
-	config := &serial.Config{Name: DEVICE, Baud: BAUD}
+	// Parsing argument to change port and baud rate
+	device := flag.String("p", "/dev/cu.usbmodemHIDCH1", "Serial port name of the device")
+	baud := flag.Int("b", 9600, "Baud rate of the device")
+	flag.Parse()
+
+	config := &serial.Config{Name: *device, Baud: *baud}
 	leonardo, err := serial.OpenPort(config)
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +50,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		color.Green("[Leonardo] Get %d bytes: %s\n", n, data)
+		color.Green("[Leonardo] Send %d bytes: %s\n", n, data)
 		clear(data)
 	}
 }
