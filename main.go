@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"leoMapleController/maker"
 	"log"
 
 	"github.com/fatih/color"
@@ -24,9 +25,25 @@ func main() {
 	}
 
 	data := make([]byte, 128)
+	// Money locating
+	// for {
+	// 	if err := maker.MoneyLocating(); err != nil {
+	// 		fmt.Println(err)
+	// 		continue
+	// 	}
+	// 	break
+	// }
+
+	// Locating
+	maker.ConfirmLocating()
+	maker.ItemLocating()
+	maker.ShowItemInfo()
+
+	// Testing
 	for {
 		// Get command from user
 		command := ""
+		fmt.Print("[Working] input your command: ")
 		_, err := fmt.Scan(&command)
 		if err != nil {
 			log.Fatal(err)
@@ -38,19 +55,26 @@ func main() {
 			continue
 		}
 
-		// Send data to leonardo
-		color.Cyan("[User] command: %s\n", command)
-		_, err = leonardo.Write([]byte(command))
-		if err != nil {
-			log.Fatal(err)
-		}
+		if command == "1" {
+			// Move cursor to left-top item
+			color.Cyan("[User] command: move cursor to left-top item\n")
+			command = fmt.Sprintf("m%d,%d\n", maker.LeftTopX, maker.LeftTopY)
+			maker.LeonardoEcho(leonardo, command, data)
+			maker.LeonardoEcho(leonardo, "g", data) // Get current location
 
-		// Get echo from leonardo
-		n, err := leonardo.Read(data)
-		if err != nil {
-			log.Fatal(err)
+		} else if command == "2" {
+			// Move cursor to right item
+			color.Cyan("[User] command: move cursor to right item\n")
+			command = fmt.Sprintf("r%d,%d\n", maker.RightDistance, 0)
+			maker.LeonardoEcho(leonardo, command, data)
+			maker.LeonardoEcho(leonardo, "g", data) // Get current location
+
+		} else if command == "3" {
+			// Move cursor to down item
+			color.Cyan("[User] command: move cursor to down item\n")
+			command = fmt.Sprintf("r%d,%d\n", 0, maker.DownDistance)
+			maker.LeonardoEcho(leonardo, command, data)
+			maker.LeonardoEcho(leonardo, "g", data) // Get current location
 		}
-		color.Green("[Leonardo] Send %d bytes: %s\n", n, data)
-		clear(data)
 	}
 }

@@ -3,16 +3,24 @@ package maker
 import (
 	"fmt"
 	"image"
+	"log"
 
+	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
+	"github.com/tarm/serial"
 )
 
 const (
 	WIN_SCREEN_X = 1919
 	WIN_SCREEN_Y = 1079
 
+	// On Windows host
 	GO_SCREEN_X = 1279
 	GO_SCREEN_Y = 719
+
+	// One MacOSX host
+	// GO_SCREEN_X = 1439
+	// GO_SCREEN_Y = 931
 
 	LEONARDO_SHIFT = 32767
 	LEONARDO_X     = 65534 // -32767 ~ 0 ~ 32767
@@ -67,4 +75,19 @@ func GetImage(x, y, width, height int, name string) {
 	defer robotgo.FreeBitmap(bit)
 	robotgo.SaveBitmap(bit, fmt.Sprintf("%s.png", name))
 	// ShowRGBA(robotgo.ToRGBA(bit), width, height)
+}
+
+func LeonardoEcho(leonardo *serial.Port, command string, data []byte) {
+	_, err := leonardo.Write([]byte(command))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Get echo from leonardo
+	n, err := leonardo.Read(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	color.Green("[Leonardo] Send %d bytes: %s\n", n, data)
+	clear(data)
 }
