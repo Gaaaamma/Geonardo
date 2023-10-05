@@ -39,9 +39,9 @@ func RareDetection() bool {
 }
 
 func MoneyLocating() error {
-	fmt.Println("[Locating] Step1: put a rare item in the mysterious block")
-	fmt.Println("[Locating] Step2: move cursor to left-top of the money field of mysterious block")
-	fmt.Println("[Locating] Step3: press 'y' to catch start position")
+	fmt.Println("[Money] Step1: put a rare item in the mysterious block")
+	fmt.Println("[Money] Step2: move cursor to left-top of the money field of mysterious block")
+	fmt.Println("[Money] Step3: press 'y' to catch start position")
 	if robotgo.AddEvent("y") {
 		GoMoneyStartX, GoMoneyStartY = robotgo.GetMousePos()
 		WinMoneyStartX = GetWindowsX(GoMoneyStartX)
@@ -49,8 +49,8 @@ func MoneyLocating() error {
 		fmt.Printf("[Start location] Go(%d, %d) => Win(%d, %d)]\n", GoMoneyStartX, GoMoneyStartY, WinMoneyStartX, WinMoneyStartY)
 	}
 
-	fmt.Println("[Locating] Step4: move cursor to right-bottom of the money field of mysterious block")
-	fmt.Println("[Locating] Step5: press 'y' to catch end position")
+	fmt.Println("[Money] Step4: move cursor to right-bottom of the money field of mysterious block")
+	fmt.Println("[Money] Step5: press 'y' to catch end position")
 	if robotgo.AddEvent("y") {
 		GoMoneyEndX, GoMoneyEndY = robotgo.GetMousePos()
 		WinMoneyEndX = GetWindowsX(GoMoneyEndX)
@@ -69,7 +69,7 @@ func rareMoneyFind() error {
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 
-	fmt.Println("[RareMoney] start finding position of '1' in 1xxxxx ")
+	fmt.Println("[Money] start finding position of '1' in 1xxxxx ")
 	for w := 0; w < Width; w++ {
 		r, g, b, _ := rgba.At(w, Height/2).RGBA()
 		if r == 0 && g == 0 && b == 0 {

@@ -8,14 +8,15 @@ import (
 )
 
 const (
-	WIN_SCREEN_X = 1920
-	WIN_SCREEN_Y = 1080
+	WIN_SCREEN_X = 1919
+	WIN_SCREEN_Y = 1079
 
-	GO_SCREEN_X = 1280
-	GO_SCREEN_Y = 720
+	GO_SCREEN_X = 1279
+	GO_SCREEN_Y = 719
 
 	LEONARDO_SHIFT = 32767
-	LEONARDO_SIZE  = 65535 // -32767 ~ 0 ~ 32767
+	LEONARDO_X     = 65534 // -32767 ~ 0 ~ 32767
+	LEONARDO_Y     = 65534 // -32767 ~ 0 ~ 32767
 )
 
 // func QuitListener(wg *sync.WaitGroup) {
@@ -35,9 +36,22 @@ func GetWindowsY(y int) int {
 	return y * WIN_SCREEN_Y / GO_SCREEN_Y
 }
 
-func GetLeonardoPosition(input int) int {
-	//TODO
-	return -1
+func GetLeonardoX(x int) int {
+	// x : ? = GO_SCREEN_X : LEONARDO_X
+	result := x * LEONARDO_X / GO_SCREEN_X
+
+	// (0,0) at center => shift
+	result -= LEONARDO_SHIFT
+	return result
+}
+
+func GetLeonardoY(y int) int {
+	// input : ? = GO_SCREEN_Y : LEONARDO_Y
+	result := y * LEONARDO_Y / GO_SCREEN_Y
+
+	// (0,0) at center => shift
+	result -= LEONARDO_SHIFT
+	return result
 }
 
 func ShowRGBA(rgba *image.RGBA, width, height int) {
