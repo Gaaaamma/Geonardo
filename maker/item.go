@@ -19,8 +19,8 @@ var (
 	LeftTopX int
 	LeftTopY int
 
-	RightDistance int
-	DownDistance  int
+	RightDistance int // 1434 under screen mode
+	DownDistance  int // 2552 under screen mode
 
 	ItemCountsX int
 	ItemCountsY int
@@ -81,7 +81,7 @@ func ItemLocating() {
 
 	fmt.Print("[Item] Step7: input the number of items in x coordination = ")
 	fmt.Scan(&ItemCountsX)
-	fmt.Print("[Item] Step8: input the number of items in x coordination = ")
+	fmt.Print("[Item] Step8: input the number of items in y coordination = ")
 	fmt.Scan(&ItemCountsY)
 }
 

@@ -14,7 +14,7 @@ const COMMAND_MAXLENGH = 16
 
 func main() {
 	// Parsing argument to change port and baud rate
-	device := flag.String("p", "/dev/cu.usbmodemHIDCH1", "Serial port name of the device")
+	device := flag.String("p", "COM10", "Serial port name of the device")
 	baud := flag.Int("b", 9600, "Baud rate of the device")
 	flag.Parse()
 
@@ -26,20 +26,19 @@ func main() {
 
 	data := make([]byte, 128)
 	// Money locating
-	// for {
-	// 	if err := maker.MoneyLocating(); err != nil {
-	// 		fmt.Println(err)
-	// 		continue
-	// 	}
-	// 	break
-	// }
+	for {
+		if err := maker.MoneyLocating(); err != nil {
+			fmt.Println(err)
+			continue
+		}
+		break
+	}
 
 	// Locating
 	maker.MysteryLocating()
 	maker.ItemLocating()
 	maker.ShowItemInfo()
 
-	// Testing
 	for {
 		// Get command from user
 		command := ""
@@ -72,6 +71,9 @@ func main() {
 			color.Cyan("[User] command: move cursor to down item\n")
 			command = fmt.Sprintf("r%d,%d\n", 0, maker.DownDistance)
 			maker.LeonardoEcho(leonardo, command, data)
+		} else if command == "4" {
+			// Experiment functionality
+			maker.SpecialToRare(leonardo)
 		}
 	}
 }
