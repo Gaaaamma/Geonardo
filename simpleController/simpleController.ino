@@ -67,9 +67,10 @@ void loop() {
 
       // Check valid movement
       if ((x <= MOVE_BOUND_MAX && x >= MOVE_BOUND_MIN) && (y <= MOVE_BOUND_MAX && y >= MOVE_BOUND_MIN)) {
-        Serial.println("[Command] move");
         AbsoluteMouse.moveTo((int)x, (int)y);
         updateLocation((int)x, (int)y);
+        getLocation();
+
       } else {
         Serial.println("[Error] invalid move");
       }
@@ -84,13 +85,12 @@ void loop() {
       
       // Check if this relatively move will exceed the bound
       if ((newX <= MOVE_BOUND_MAX && newX >= MOVE_BOUND_MIN) && (newY <= MOVE_BOUND_MAX && newY >= MOVE_BOUND_MIN)) {
-        Serial.println("[Command] relative move");
         AbsoluteMouse.move((int)x, (int)y);
         currentX = (int)newX;
         currentY = (int)newY;
+        getLocation();
 
       } else {
-        Serial.println("[Command] relative move over bound");
         if (newX > MOVE_BOUND_MAX) {
           newX = MOVE_BOUND_MAX;
         } else if (newX < MOVE_BOUND_MIN) {
@@ -104,12 +104,14 @@ void loop() {
         }
         AbsoluteMouse.moveTo((int)newX, (int)newY);
         updateLocation((int)newX, (int)newY);
+        getLocation();
+
       }
 
     } else if (c == 'c') {  // Move to the center of the screen
-      Serial.println("[Command] center");
       AbsoluteMouse.moveTo(0, 0);
       updateLocation(0, 0);
+      getLocation();
 
     } else if (c == 'g') {  // Get current location
       getLocation();
