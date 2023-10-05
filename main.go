@@ -60,21 +60,18 @@ func main() {
 			color.Cyan("[User] command: move cursor to left-top item\n")
 			command = fmt.Sprintf("m%d,%d\n", maker.LeftTopX, maker.LeftTopY)
 			maker.LeonardoEcho(leonardo, command, data)
-			maker.LeonardoEcho(leonardo, "g", data) // Get current location
 
 		} else if command == "2" {
 			// Move cursor to right item
 			color.Cyan("[User] command: move cursor to right item\n")
 			command = fmt.Sprintf("r%d,%d\n", maker.RightDistance, 0)
 			maker.LeonardoEcho(leonardo, command, data)
-			maker.LeonardoEcho(leonardo, "g", data) // Get current location
 
 		} else if command == "3" {
 			// Move cursor to down item
 			color.Cyan("[User] command: move cursor to down item\n")
 			command = fmt.Sprintf("r%d,%d\n", 0, maker.DownDistance)
 			maker.LeonardoEcho(leonardo, command, data)
-			maker.LeonardoEcho(leonardo, "g", data) // Get current location
 		}
 	}
 }
