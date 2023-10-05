@@ -5,9 +5,14 @@ s(115): single click
 d(100): double click
 
 m(109): move mouse position (with two following integer separated by ',' end with '\n' or any character)
+  - x: absolute x moving
+  - y: absolute y moving
+  - Example: m240,31\n, m-243,-43.
+
+r(114): move mouse relatively (with two following integer separated by ',' end with '\n' or any character)
   - x: relative x moving
   - y: relative y moving
-  - Example: m240,31\n, m-243,-43.
+  - Example: r240,31\n, r-243,-43.
 
 c(99): move mouse position to center (0,0)
 
@@ -67,6 +72,38 @@ void loop() {
         updateLocation((int)x, (int)y);
       } else {
         Serial.println("[Error] invalid move");
+      }
+
+    } else if (c == 'r') { // Move relatively
+      long x = Serial.parseInt();
+      Serial.read();  // consume ',' in the buffer
+      long y = Serial.parseInt();
+
+      long newX = (long)currentX + x;
+      long newY = (long)currentY + y;
+      
+      // Check if this relatively move will exceed the bound
+      if ((newX <= MOVE_BOUND_MAX && newX >= MOVE_BOUND_MIN) && (newY <= MOVE_BOUND_MAX && newY >= MOVE_BOUND_MIN)) {
+        Serial.println("[Command] relative move");
+        AbsoluteMouse.move((int)x, (int)y);
+        currentX = (int)newX;
+        currentY = (int)newY;
+
+      } else {
+        Serial.println("[Command] relative move over bound");
+        if (newX > MOVE_BOUND_MAX) {
+          newX = MOVE_BOUND_MAX;
+        } else if (newX < MOVE_BOUND_MIN) {
+          newX = MOVE_BOUND_MIN;
+        }
+
+        if (newY > MOVE_BOUND_MAX) {
+          newY = MOVE_BOUND_MAX;
+        } else if (newY < MOVE_BOUND_MIN) {
+          newY = MOVE_BOUND_MIN;
+        }
+        AbsoluteMouse.moveTo((int)newX, (int)newY);
+        updateLocation((int)newX, (int)newY);
       }
 
     } else if (c == 'c') {  // Move to the center of the screen
