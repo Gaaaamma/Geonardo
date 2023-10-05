@@ -35,7 +35,7 @@ func main() {
 	// }
 
 	// Locating
-	maker.ConfirmLocating()
+	maker.MysteryLocating()
 	maker.ItemLocating()
 	maker.ShowItemInfo()
 

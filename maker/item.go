@@ -13,6 +13,9 @@ var (
 	SecondConfirmX int
 	SecondConfirmY int
 
+	MysteryItemX int
+	MysteryItemY int
+
 	LeftTopX int
 	LeftTopY int
 
@@ -23,18 +26,26 @@ var (
 	ItemCountsY int
 )
 
-func ConfirmLocating() {
-	fmt.Println("[Confirm] Step1: move cursor to first confirm button")
-	fmt.Println("[Confirm] Step2: press 'y' to catch position")
+func MysteryLocating() {
+	fmt.Println("[Mystery] Step1: move cursor to mystery item")
+	fmt.Println("[Mystery] Step2: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		MysteryItemX = GetLeonardoX(x)
+		MysteryItemY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Mystery] Step3: move cursor to first confirm button")
+	fmt.Println("[Mystery] Step4: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		FirstConfirmX = GetLeonardoX(x)
 		FirstConfirmY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Confirm] Step3: press first confirm to get second confirm button")
-	fmt.Println("[Confirm] Step4: move cursor to second confirm button")
-	fmt.Println("[Confirm] Step5: press 'y' to catch position")
+	fmt.Println("[Mystery] Step5: press first confirm to get second confirm button")
+	fmt.Println("[Mystery] Step6: move cursor to second confirm button")
+	fmt.Println("[Mystery] Step7: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		SecondConfirmX = GetLeonardoX(x)
@@ -75,6 +86,8 @@ func ItemLocating() {
 }
 
 func ShowItemInfo() {
+	fmt.Printf("MysteryItemX = %d\n", MysteryItemX)
+	fmt.Printf("MysteryItemY = %d\n\n", MysteryItemY)
 	fmt.Printf("FirstConfirmX = %d\n", FirstConfirmX)
 	fmt.Printf("FirstConfirmY = %d\n\n", FirstConfirmY)
 	fmt.Printf("SecondConfirmX = %d\n", SecondConfirmX)
