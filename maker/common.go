@@ -135,3 +135,7 @@ func isYellow(r, g, b uint8) bool {
 func isWhite(r, g, b uint8) bool {
 	return (r == 255 && g == 255 && b == 255)
 }
+
+func isBlack(r, g, b uint8) bool {
+	return (r == 0 && g == 0 && b == 0)
+}

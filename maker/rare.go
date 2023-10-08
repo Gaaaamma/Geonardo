@@ -95,7 +95,10 @@ func RareDetection() bool {
 	robotgo.FreeBitmap(bit)
 	for i := -1; i <= 1; i++ {
 		r, g, b, _ := rgba.At(RareX, RareY+i).RGBA()
-		if r == 0 && g == 0 && b == 0 {
+		r8 := (uint8)(r >> 8)
+		g8 := (uint8)(g >> 8)
+		b8 := (uint8)(b >> 8)
+		if isBlack(r8, g8, b8) {
 			fmt.Println("[Rare] This is a rare item")
 			return true
 		}
@@ -138,11 +141,21 @@ func rareMoneyFind() error {
 	fmt.Println("[Money] start finding position of '1' in 1xxxxx ")
 	for w := 0; w < Width; w++ {
 		r, g, b, _ := rgba.At(w, Height/2).RGBA()
-		if r == 0 && g == 0 && b == 0 {
+		r8 := (uint8)(r >> 8)
+		g8 := (uint8)(g >> 8)
+		b8 := (uint8)(b >> 8)
+		if isBlack(r8, g8, b8) {
 			// Find black here -> check if it is number '1'
 			ur, ug, ub, _ := rgba.At(w, Height/2-1).RGBA()
 			dr, dg, db, _ := rgba.At(w, Height/2+1).RGBA()
-			if ur == 0 && ug == 0 && ub == 0 && dr == 0 && dg == 0 && db == 0 {
+
+			ur8 := (uint8)(ur >> 8)
+			ug8 := (uint8)(ug >> 8)
+			ub8 := (uint8)(ub >> 8)
+			dr8 := (uint8)(dr >> 8)
+			dg8 := (uint8)(dg >> 8)
+			db8 := (uint8)(db >> 8)
+			if isBlack(ur8, ug8, ub8) && isBlack(dr8, dg8, db8) {
 				RareX = w
 				RareY = Height / 2
 
