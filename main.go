@@ -1,9 +1,9 @@
 package main
 
 import (
+	"Geonardo/maker"
 	"flag"
 	"fmt"
-	"leoMapleController/maker"
 	"log"
 
 	"github.com/fatih/color"
