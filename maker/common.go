@@ -26,6 +26,10 @@ const (
 	LEONARDO_SHIFT = 32767
 	LEONARDO_X     = 65534 // -32767 ~ 0 ~ 32767
 	LEONARDO_Y     = 65534 // -32767 ~ 0 ~ 32767
+
+	YELLO_R = 255
+	YELLO_G = 255
+	YELLO_B = 17
 )
 
 // func QuitListener(wg *sync.WaitGroup) {
@@ -91,9 +95,13 @@ func ReadFileRGBA(path string) {
 }
 
 func ShowRGBA(rgba *image.RGBA, width, height int) {
-	for h := 0; h < height; h++ {
-		for i := 0; i < width; i++ {
-			fmt.Printf("[%d,%d] = %+v\n", h, i, rgba.At(i, h))
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			r, g, b, _ := rgba.At(x, y).RGBA()
+			r8 := (uint8)(r >> 8)
+			g8 := (uint8)(g >> 8)
+			b8 := (uint8)(b >> 8)
+			fmt.Printf("[%d,%d] = (%d,%d,%d)\n", x, y, r8, g8, b8)
 		}
 	}
 }
@@ -118,4 +126,12 @@ func LeonardoEcho(leonardo *serial.Port, command string, data []byte) {
 	}
 	color.Green("[Leonardo] Send %d bytes: %s\n", n, data)
 	clear(data)
+}
+
+func isYellow(r, g, b uint8) bool {
+	return (r == YELLO_R && g == YELLO_G && b == YELLO_B)
+}
+
+func isWhite(r, g, b uint8) bool {
+	return (r == 255 && g == 255 && b == 255)
 }
