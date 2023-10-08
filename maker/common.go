@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"os"
 
 	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
@@ -62,10 +63,37 @@ func GetLeonardoY(y int) int {
 	return result
 }
 
+func ReadFileRGBA(path string) {
+	// Decode the PNG data. If reading from file, create a reader
+	reader, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer reader.Close()
+
+	img, _, err := image.Decode(reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Create an RGBA image
+	rgba := image.NewRGBA(img.Bounds())
+
+	// Convert the decoded image to RGBA
+	for y := rgba.Bounds().Min.Y; y < rgba.Bounds().Max.Y; y++ {
+		for x := rgba.Bounds().Min.X; x < rgba.Bounds().Max.X; x++ {
+			rgba.Set(x, y, img.At(x, y))
+		}
+	}
+
+	// Now that you have the RGBA image, you can display its values
+	ShowRGBA(rgba, rgba.Bounds().Dx(), rgba.Bounds().Dy())
+}
+
 func ShowRGBA(rgba *image.RGBA, width, height int) {
 	for h := 0; h < height; h++ {
 		for i := 0; i < width; i++ {
-			fmt.Printf("[%d,%d] = %+v]\n", h, i, rgba.At(i, h))
+			fmt.Printf("[%d,%d] = %+v\n", h, i, rgba.At(i, h))
 		}
 	}
 }
