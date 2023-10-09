@@ -3,6 +3,7 @@ package maker
 import (
 	"fmt"
 	"image"
+	"log"
 
 	"github.com/fatih/color"
 )
@@ -18,19 +19,24 @@ const (
 	ZN_HEIGHT           = 12
 	EN_DISTANCE         = 6
 	RARE_FIRST_DISTANCE = 4
+	POTENTIAL_TARGET    = 9
 )
 
 var (
-	RootX         int
-	RootY         int
-	YelloTopLineX []int
-	STR           [8][]int
-	INT           [8][]int
-	DEX           [8][]int
-	LUK           [8][]int
-	ALL           [8][]int
-	THREE         [8][]int
-	SIX           [8][]int
+	PotentialStartX int
+	PotentialStartY int
+	PotentialWidth  int
+	PotentialHeight int
+	RootX           int
+	RootY           int
+	YelloTopLineX   []int
+	STR             [8][]int
+	INT             [8][]int
+	DEX             [8][]int
+	LUK             [8][]int
+	ALL             [8][]int
+	THREE           [8][]int
+	SIX             [8][]int
 )
 
 func init() {
@@ -105,6 +111,40 @@ func init() {
 		{42, 46, 49, 51, 53},
 		{43, 44, 45, 49, 52},
 	}
+}
+
+func PotentialDetection(rgba *image.RGBA) bool {
+	// bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
+	// rgba := robotgo.ToRGBA(bit)
+	// robotgo.FreeBitmap(bit)
+
+	potential := make(map[string]int)
+	attrs := []string{"STR", "INT", "DEX", "LUK", "ALL"}
+
+	for i := 0; i < 3; i++ {
+		rootX := RootX
+		rootY := RootY + i*(EN_HEIGHT+EN_DISTANCE)
+
+		// Check the attribute of each row
+		for _, attr := range attrs {
+			value, err := attributeDetection(rootX, rootY, rgba, attr)
+			if err != nil {
+				log.Fatal(err)
+			}
+			potential[attr] += value
+		}
+	}
+	color.Green("[Potential] report %+v\n", potential)
+
+	// Check if this item meet the target
+	maxPotential := 0
+	for k, v := range potential {
+		if k != "ALL" {
+			maxPotential = max(maxPotential, v)
+		}
+	}
+	maxPotential += potential["ALL"]
+	return maxPotential >= POTENTIAL_TARGET
 }
 
 // Find the reference position of ability words (STR/INT/DEX/LUK)
@@ -194,4 +234,79 @@ func WordCheck(word [8][]int) {
 		fmt.Println()
 	}
 	fmt.Println("")
+}
+
+func attributeDetection(rootX, rootY int, rgba *image.RGBA, attr string) (int, error) {
+	// Attribute selection
+	attribute := [8][]int{}
+	switch attr {
+	case "STR":
+		attribute = STR
+	case "INT":
+		attribute = INT
+	case "DEX":
+		attribute = DEX
+	case "LUK":
+		attribute = LUK
+	case "ALL":
+		attribute = ALL
+	default:
+		return 0, fmt.Errorf("[Error] unknown attribute: %s", attr)
+	}
+
+	// Check attribute first
+	for h := 0; h < len(attribute); h++ {
+		for _, w := range attribute[h] {
+			r, g, b, _ := rgba.At(rootX+w, rootY+h).RGBA()
+			r8 := (uint8)(r >> 8)
+			g8 := (uint8)(g >> 8)
+			b8 := (uint8)(b >> 8)
+			if !isWhite(r8, g8, b8) {
+				return 0, nil
+			}
+		}
+	}
+
+	// Check percentage second
+	fmt.Printf("[Potential] find attribute: %s\n", attr)
+	if attr == "ALL" {
+		return 3, nil
+	} else {
+		percent, err := percentDetection(rootX, rootY, rgba, 6)
+		if percent != 0 || err != nil {
+			return percent, err
+		}
+		percent, err = percentDetection(rootX, rootY, rgba, 3)
+		if percent != 0 || err != nil {
+			return percent, err
+		}
+	}
+	return 0, nil
+}
+
+func percentDetection(rootX, rootY int, rgba *image.RGBA, percent int) (int, error) {
+	// Percent selection
+	verification := [8][]int{}
+	switch percent {
+	case 3:
+		verification = THREE
+	case 6:
+		verification = SIX
+	default:
+		return 0, fmt.Errorf("[Error] unknown percent: %d", percent)
+	}
+
+	for h := 0; h < len(verification); h++ {
+		for _, w := range verification[h] {
+			r, g, b, _ := rgba.At(rootX+w, rootY+h).RGBA()
+			r8 := (uint8)(r >> 8)
+			g8 := (uint8)(g >> 8)
+			b8 := (uint8)(b >> 8)
+			if !isWhite(r8, g8, b8) {
+				return 0, nil
+			}
+		}
+	}
+	fmt.Printf("[Potential] find percent: %d\n", percent)
+	return percent, nil
 }

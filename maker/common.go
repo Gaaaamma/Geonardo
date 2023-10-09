@@ -67,7 +67,7 @@ func GetLeonardoY(y int) int {
 	return result
 }
 
-func ReadFileRGBA(path string) {
+func ReadFileRGBA(path string) *image.RGBA {
 	// Decode the PNG data. If reading from file, create a reader
 	reader, err := os.Open(path)
 	if err != nil {
@@ -89,9 +89,7 @@ func ReadFileRGBA(path string) {
 			rgba.Set(x, y, img.At(x, y))
 		}
 	}
-
-	// Now that you have the RGBA image, you can display its values
-	ShowRGBA(rgba, rgba.Bounds().Dx(), rgba.Bounds().Dy())
+	return rgba
 }
 
 func ShowRGBA(rgba *image.RGBA, width, height int) {
