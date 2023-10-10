@@ -146,17 +146,25 @@ func PotentialDetection() bool {
 			potential[attr] += value
 		}
 	}
-	color.Green("[Potential] report %+v\n", potential)
 
 	// Check if this item meet the target
+	attr := ""
 	maxPotential := 0
 	for k, v := range potential {
-		if k != "ALL" {
-			maxPotential = max(maxPotential, v)
+		if k != "ALL" && v > maxPotential {
+			attr = k
+			maxPotential = v
 		}
 	}
 	maxPotential += potential["ALL"]
-	return maxPotential >= POTENTIAL_TARGET
+
+	if maxPotential >= POTENTIAL_TARGET {
+		color.Green("[Potential] %s: %+v\n", attr, potential)
+		return true
+	} else {
+		color.Yellow("[Potential] %+v\n", potential)
+		return false
+	}
 }
 
 // Potential locating flow called by user
@@ -347,7 +355,6 @@ func attributeDetection(rootX, rootY int, rgba *image.RGBA, attr string) (int, e
 	}
 
 	// Check percentage second
-	fmt.Printf("[Potential] find attribute: %s\n", attr)
 	if attr == "ALL" {
 		return 3, nil
 	} else {
@@ -386,6 +393,5 @@ func percentDetection(rootX, rootY int, rgba *image.RGBA, percent int) (int, err
 			}
 		}
 	}
-	fmt.Printf("[Potential] find percent: %d\n", percent)
 	return percent, nil
 }
