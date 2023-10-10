@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/fatih/color"
+	"github.com/go-vgo/robotgo"
 )
 
 // STR
@@ -23,20 +24,30 @@ const (
 )
 
 var (
+	// Potential setting
+	ConsumeX          int
+	ConsumeY          int
+	PotentialCubeX    int
+	PotentialCubeY    int
+	PotentialConfirmX int
+	PotentialConfirmY int
+
 	PotentialStartX int
 	PotentialStartY int
 	PotentialWidth  int
 	PotentialHeight int
-	RootX           int
-	RootY           int
-	YelloTopLineX   []int
-	STR             [8][]int
-	INT             [8][]int
-	DEX             [8][]int
-	LUK             [8][]int
-	ALL             [8][]int
-	THREE           [8][]int
-	SIX             [8][]int
+
+	RootX int
+	RootY int
+
+	YelloTopLineX []int
+	STR           [8][]int
+	INT           [8][]int
+	DEX           [8][]int
+	LUK           [8][]int
+	ALL           [8][]int
+	THREE         [8][]int
+	SIX           [8][]int
 )
 
 func init() {
@@ -113,10 +124,11 @@ func init() {
 	}
 }
 
-func PotentialDetection(rgba *image.RGBA) bool {
-	// bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
-	// rgba := robotgo.ToRGBA(bit)
-	// robotgo.FreeBitmap(bit)
+// Detect potential result meet requirements or not
+func PotentialDetection() bool {
+	bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
+	rgba := robotgo.ToRGBA(bit)
+	robotgo.FreeBitmap(bit)
 
 	potential := make(map[string]int)
 	attrs := []string{"STR", "INT", "DEX", "LUK", "ALL"}
@@ -147,8 +159,96 @@ func PotentialDetection(rgba *image.RGBA) bool {
 	return maxPotential >= POTENTIAL_TARGET
 }
 
-// Find the reference position of ability words (STR/INT/DEX/LUK)
-func FindRoot(rgba *image.RGBA) error {
+// Potential locating flow called by user
+func PotentialLocating() {
+	for {
+		potentialLocating()
+		if err := findRoot(); err != nil {
+			color.Red("%s", err)
+			continue
+		}
+		break
+	}
+}
+
+// Used to check the word position
+func WordCheck(word [8][]int) {
+	maxLength := 0
+	for i := 0; i < len(word); i++ {
+		maxLength = max(maxLength, word[i][len(word[i])-1])
+	}
+	fmt.Println("")
+	for i := 0; i < len(word); i++ {
+		counter := 0
+		for j := 0; j <= maxLength; j++ {
+			if counter >= len(word[i]) || j != word[i][counter] {
+				fmt.Print(" ")
+			} else {
+				fmt.Print("=")
+				counter += 1
+			}
+		}
+		fmt.Println()
+	}
+	fmt.Println("")
+}
+
+// Set potential cube position
+func potentialLocating() {
+	fmt.Println("[Potential] Step1: move cursor to consume column")
+	fmt.Println("[Potential] Step2: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		ConsumeX = GetLeonardoX(x)
+		ConsumeY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step3: move cursor to potential cube")
+	fmt.Println("[Potential] Step4: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		PotentialCubeX = GetLeonardoX(x)
+		PotentialCubeY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step5: double click the cube and set any item")
+	fmt.Println("[Potential] Step6: confirm to get first potential result")
+	fmt.Println("[Potential] Step7: move cursor to potential confirm button")
+	fmt.Println("[Potential] Step8: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		PotentialConfirmX = GetLeonardoX(x)
+		PotentialConfirmY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step9: move cursor to left-top of the result")
+	fmt.Println("[Potential] Step10: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		PotentialStartX = GetWindowsX(x)
+		PotentialStartY = GetWindowsY(y)
+	}
+
+	fmt.Println("[Potential] Step11: move cursor to right-bottom of the result")
+	fmt.Println("[Potential] Step12: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		x = GetWindowsX(x)
+		y = GetWindowsY(y)
+		PotentialWidth = x - PotentialStartX
+		PotentialHeight = y - PotentialStartY
+	}
+
+	fmt.Println("[Potential] Step13: confirm position of image 'potential.png' is correct")
+	GetImage(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight, "potential")
+}
+
+// Find the reference position of attribute words (STR/INT/DEX/LUK)
+func findRoot() error {
+	bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
+	rgba := robotgo.ToRGBA(bit)
+	robotgo.FreeBitmap(bit)
+
 	if !findRootX(rgba) {
 		return fmt.Errorf("[Potential] find RootX failed")
 	}
@@ -213,27 +313,6 @@ func findRootY(rgba *image.RGBA) bool {
 		}
 	}
 	return false
-}
-
-func WordCheck(word [8][]int) {
-	maxLength := 0
-	for i := 0; i < len(word); i++ {
-		maxLength = max(maxLength, word[i][len(word[i])-1])
-	}
-	fmt.Println("")
-	for i := 0; i < len(word); i++ {
-		counter := 0
-		for j := 0; j <= maxLength; j++ {
-			if counter >= len(word[i]) || j != word[i][counter] {
-				fmt.Print(" ")
-			} else {
-				fmt.Print("=")
-				counter += 1
-			}
-		}
-		fmt.Println()
-	}
-	fmt.Println("")
 }
 
 func attributeDetection(rootX, rootY int, rgba *image.RGBA, attr string) (int, error) {

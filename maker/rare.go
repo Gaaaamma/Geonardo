@@ -19,17 +19,26 @@ var (
 	WinMoneyStartY int
 	WinMoneyEndX   int
 	WinMoneyEndY   int
-	Width          int
-	Height         int
+	MoneyWidth     int
+	MoneyHeight    int
 
 	RareX int
 	RareY int
+
+	FirstConfirmX int
+	FirstConfirmY int
+
+	SecondConfirmX int
+	SecondConfirmY int
+
+	MysticItemX int
+	MysticItemY int
 )
 
 func SpecialToRare(leonardo *serial.Port) {
 	// command list
 	command_toFirstItem := fmt.Sprintf("m%d,%d\n", LeftTopX, LeftTopY)
-	command_toMysteryItem := fmt.Sprintf("m%d,%d\n", MysteryItemX, MysteryItemY)
+	command_toMysteryItem := fmt.Sprintf("m%d,%d\n", MysticItemX, MysticItemY)
 	command_toFirstConfirm := fmt.Sprintf("m%d,%d\n", FirstConfirmX, FirstConfirmY)
 	command_toSecondConfirm := fmt.Sprintf("m%d,%d\n", SecondConfirmX, SecondConfirmY)
 	command_singleClick := "s"
@@ -90,7 +99,7 @@ func SpecialToRare(leonardo *serial.Port) {
 }
 
 func RareDetection() bool {
-	bit := robotgo.CaptureScreen(WinMoneyStartX, WinMoneyStartY, Width, Height)
+	bit := robotgo.CaptureScreen(WinMoneyStartX, WinMoneyStartY, MoneyWidth, MoneyHeight)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 	for i := -1; i <= 1; i++ {
@@ -107,9 +116,46 @@ func RareDetection() bool {
 	return false
 }
 
-func MoneyLocating() error {
-	fmt.Println("[Money] Step1: put a rare item in the mysterious block")
-	fmt.Println("[Money] Step2: move cursor to left-top of the money field of mysterious block")
+func MysticLocating() {
+	// Money locating
+	for {
+		if err := moneyLocating(); err != nil {
+			fmt.Println(err)
+			continue
+		}
+		break
+	}
+
+	// Mystic cube locating
+	fmt.Println("[Mystic] Step1: move cursor to mystic item")
+	fmt.Println("[Mystic] Step2: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		MysticItemX = GetLeonardoX(x)
+		MysticItemY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Mystic] Step3: move cursor to first confirm button")
+	fmt.Println("[Mystic] Step4: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		FirstConfirmX = GetLeonardoX(x)
+		FirstConfirmY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Mystic] Step5: press first confirm to get second confirm button")
+	fmt.Println("[Mystic] Step6: move cursor to second confirm button")
+	fmt.Println("[Mystic] Step7: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		SecondConfirmX = GetLeonardoX(x)
+		SecondConfirmY = GetLeonardoY(y)
+	}
+}
+
+func moneyLocating() error {
+	fmt.Println("[Money] Step1: put a rare item in the mystic cube")
+	fmt.Println("[Money] Step2: move cursor to left-top of the money field of mystic cube")
 	fmt.Println("[Money] Step3: press 'y' to catch start position")
 	if robotgo.AddEvent("y") {
 		GoMoneyStartX, GoMoneyStartY = robotgo.GetMousePos()
@@ -118,7 +164,7 @@ func MoneyLocating() error {
 		fmt.Printf("[Start location] Go(%d, %d) => Win(%d, %d)]\n", GoMoneyStartX, GoMoneyStartY, WinMoneyStartX, WinMoneyStartY)
 	}
 
-	fmt.Println("[Money] Step4: move cursor to right-bottom of the money field of mysterious block")
+	fmt.Println("[Money] Step4: move cursor to right-bottom of the money field of mystic cube")
 	fmt.Println("[Money] Step5: press 'y' to catch end position")
 	if robotgo.AddEvent("y") {
 		GoMoneyEndX, GoMoneyEndY = robotgo.GetMousePos()
@@ -127,27 +173,27 @@ func MoneyLocating() error {
 		fmt.Printf("[End location] Go(%d, %d) => Win(%d, %d)]\n", GoMoneyEndX, GoMoneyEndY, WinMoneyEndX, WinMoneyEndY)
 	}
 
-	Width = WinMoneyEndX - WinMoneyStartX
-	Height = WinMoneyEndY - WinMoneyStartY
-	GetImage(WinMoneyStartX, WinMoneyStartY, Width, Height, "MoneyPosition")
+	MoneyWidth = WinMoneyEndX - WinMoneyStartX
+	MoneyHeight = WinMoneyEndY - WinMoneyStartY
+	GetImage(WinMoneyStartX, WinMoneyStartY, MoneyWidth, MoneyHeight, "MoneyPosition")
 	return rareMoneyFind()
 }
 
 func rareMoneyFind() error {
-	bit := robotgo.CaptureScreen(WinMoneyStartX, WinMoneyStartY, Width, Height)
+	bit := robotgo.CaptureScreen(WinMoneyStartX, WinMoneyStartY, MoneyWidth, MoneyHeight)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 
 	fmt.Println("[Money] start finding position of '1' in 1xxxxx ")
-	for w := 0; w < Width; w++ {
-		r, g, b, _ := rgba.At(w, Height/2).RGBA()
+	for w := 0; w < MoneyWidth; w++ {
+		r, g, b, _ := rgba.At(w, MoneyHeight/2).RGBA()
 		r8 := (uint8)(r >> 8)
 		g8 := (uint8)(g >> 8)
 		b8 := (uint8)(b >> 8)
 		if isBlack(r8, g8, b8) {
 			// Find black here -> check if it is number '1'
-			ur, ug, ub, _ := rgba.At(w, Height/2-1).RGBA()
-			dr, dg, db, _ := rgba.At(w, Height/2+1).RGBA()
+			ur, ug, ub, _ := rgba.At(w, MoneyHeight/2-1).RGBA()
+			dr, dg, db, _ := rgba.At(w, MoneyHeight/2+1).RGBA()
 
 			ur8 := (uint8)(ur >> 8)
 			ug8 := (uint8)(ug >> 8)
@@ -157,7 +203,7 @@ func rareMoneyFind() error {
 			db8 := (uint8)(db >> 8)
 			if isBlack(ur8, ug8, ub8) && isBlack(dr8, dg8, db8) {
 				RareX = w
-				RareY = Height / 2
+				RareY = MoneyHeight / 2
 
 				fmt.Printf("[Success] find rare first '1' at Rec[%d, %d]\n", RareX, RareY)
 				return nil
