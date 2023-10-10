@@ -4,6 +4,7 @@ import (
 	"Geonardo/maker"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -65,8 +66,12 @@ func main() {
 		} else if command == "4" {
 			// maker.SpecialToRare(leonardo)
 
-		} else if command == "5" {
-			maker.PotentialDetection()
+		} else if command == "0" {
+			// Comman for experiment
+			for {
+				maker.PotentialDetection()
+				time.Sleep(500 * time.Millisecond)
+			}
 		}
 	}
 }
