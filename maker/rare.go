@@ -36,64 +36,37 @@ var (
 )
 
 func SpecialToRare(leonardo *serial.Port) {
-	// command list
-	command_toFirstItem := fmt.Sprintf("m%d,%d\n", LeftTopX, LeftTopY)
-	command_toMysteryItem := fmt.Sprintf("m%d,%d\n", MysticItemX, MysticItemY)
-	command_toFirstConfirm := fmt.Sprintf("m%d,%d\n", FirstConfirmX, FirstConfirmY)
-	command_toSecondConfirm := fmt.Sprintf("m%d,%d\n", SecondConfirmX, SecondConfirmY)
-	command_singleClick := "s"
-
-	command_toRightItem := fmt.Sprintf("r%d,%d\n", RightDistance, 0)
-	command_toDownItem := fmt.Sprintf("r%d,%d\n", 0, DownDistance)
-	// command_toLeftItem := fmt.Sprintf("r%d,%d\n", -1*RightDistance, 0)
-	// command_toUpItem := fmt.Sprintf("r%d,%d\n", 0, -1*DownDistance)
-
-	// Step0. move mouse to leftTop item
 	data := make([]byte, 128)
-	LeonardoEcho(leonardo, command_toFirstItem, data)
-	time.Sleep(time.Second)
-
 	for j := 0; j < ItemCountsY; j++ {
 		for i := 0; i < ItemCountsX; i++ {
-			// Step1: Vertical movement
-			for k := 0; k < j; k++ {
-				LeonardoEcho(leonardo, command_toDownItem, data)
-				time.Sleep(200 * time.Millisecond)
-			}
-			// Step2: Horizontal movement
-			for k := 0; k < i; k++ {
-				LeonardoEcho(leonardo, command_toRightItem, data)
-				time.Sleep(200 * time.Millisecond)
-			}
+			// Step1: Move to the item
+			MoveToItem(leonardo, i, j, 200)
 
-			// Step3: Drag item to mystic cube
+			// Step2: Drag item to mystic cube
 			LeonardoEcho(leonardo, command_singleClick, data)
 			time.Sleep(time.Second)
-			LeonardoEcho(leonardo, command_toMysteryItem, data)
+			LeonardoEcho(leonardo, command_toMisticItem, data)
 			time.Sleep(time.Second)
 			LeonardoEcho(leonardo, command_singleClick, data)
 			time.Sleep(time.Second)
 
-			// Step4: Rare detection and works
+			// Step3: Rare detection and works
 			for !RareDetection() {
 				// Special item
-				// Step5: Move to First confirm button and click
+				// Step4: Move to First confirm button and click
 				sleep := rand.Intn(30) + 10
-				LeonardoEcho(leonardo, command_toFirstConfirm, data)
+				LeonardoEcho(leonardo, command_toMisticConfirmA, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 				LeonardoEcho(leonardo, command_singleClick, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 
-				// Step6: Move to Second confirm button and click
-				LeonardoEcho(leonardo, command_toSecondConfirm, data)
+				// Step5: Move to Second confirm button and click
+				LeonardoEcho(leonardo, command_toMisticConfirmB, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 				LeonardoEcho(leonardo, command_singleClick, data)
 				time.Sleep(900 * time.Millisecond)
 			}
-			// Step7: Move back to first item
 			fmt.Printf("[Rare] it is rare now\n")
-			LeonardoEcho(leonardo, command_toFirstItem, data)
-			time.Sleep(time.Second)
 		}
 	}
 }

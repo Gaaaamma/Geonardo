@@ -2,38 +2,43 @@ package main
 
 import (
 	"Geonardo/maker"
+	"flag"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/tarm/serial"
 )
 
 const COMMAND_MAXLENGH = 16
 
 func main() {
 	// Parsing argument to change port and baud rate
-	// device := flag.String("p", "COM10", "Serial port name of the device")
-	// baud := flag.Int("b", 9600, "Baud rate of the device")
-	// flag.Parse()
-	//
-	// config := &serial.Config{Name: *device, Baud: *baud}
-	// leonardo, err := serial.OpenPort(config)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	device := flag.String("p", "COM10", "Serial port name of the device")
+	baud := flag.Int("b", 9600, "Baud rate of the device")
+	flag.Parse()
+
+	config := &serial.Config{Name: *device, Baud: *baud}
+	leonardo, err := serial.OpenPort(config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Locating
 	maker.ItemLocating(true)
 	maker.MysticLocating()
 	maker.PotentialLocating()
 
+	// Command initialization
+	maker.CommandInit()
+
 	// Get command from user and work
-	// data := make([]byte, 128)
+	data := make([]byte, 128)
 	for {
 		// Get command from user
 		command := ""
-		fmt.Print("[Working] input your command: ")
+		fmt.Print("[Geonardo] input your command: ")
 		_, err := fmt.Scan(&command)
 		if err != nil {
 			log.Fatal(err)
@@ -45,29 +50,52 @@ func main() {
 			continue
 		}
 
-		if command == "1" {
-			// Move cursor to left-top item
+		if command == "cursor" { // Test cursor movement among items is correct or not
+			for y := 0; y < maker.ItemCountsY; y++ {
+				for x := 0; x < maker.ItemCountsX; x++ {
+					maker.MoveToItem(leonardo, x, y, 200)
+				}
+			}
+
+		} else if command == "reset" { // Reset config of Item, Mystic or Potential
+			fmt.Print("[Geonardo] reset config (ItemT, ItemF, Mystic, Potential): ")
+			if _, err := fmt.Scan(&command); err != nil {
+				log.Fatal(err)
+			}
+			switch command {
+			case "ItemT":
+				maker.ItemLocating(true)
+			case "ItemF":
+				maker.ItemLocating(false)
+			case "Mystic":
+				maker.MysticLocating()
+			case "Potential":
+				maker.PotentialLocating()
+			default:
+				continue
+			}
+			// Need to update the command
+			maker.CommandInit()
+
+		} else if command == "1" { // Move cursor to left-top item
 			color.Cyan("[User] command: move cursor to left-top item\n")
 			command = fmt.Sprintf("m%d,%d\n", maker.LeftTopX, maker.LeftTopY)
-			// maker.LeonardoEcho(leonardo, command, data)
+			maker.LeonardoEcho(leonardo, command, data)
 
-		} else if command == "2" {
-			// Move cursor to right item
+		} else if command == "2" { // Move cursor to right item
 			color.Cyan("[User] command: move cursor to right item\n")
 			command = fmt.Sprintf("r%d,%d\n", maker.RightDistance, 0)
-			// maker.LeonardoEcho(leonardo, command, data)
+			maker.LeonardoEcho(leonardo, command, data)
 
-		} else if command == "3" {
-			// Move cursor to down item
+		} else if command == "3" { // Move cursor to down item
 			color.Cyan("[User] command: move cursor to down item\n")
 			command = fmt.Sprintf("r%d,%d\n", 0, maker.DownDistance)
-			// maker.LeonardoEcho(leonardo, command, data)
+			maker.LeonardoEcho(leonardo, command, data)
 
-		} else if command == "4" {
-			// maker.SpecialToRare(leonardo)
+		} else if command == "4" { // SpecialToRare
+			maker.SpecialToRare(leonardo)
 
-		} else if command == "0" {
-			// Comman for experiment
+		} else if command == "0" { // Command for experiment
 			for {
 				maker.PotentialDetection()
 				time.Sleep(500 * time.Millisecond)

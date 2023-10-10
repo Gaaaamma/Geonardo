@@ -7,6 +7,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
+	"github.com/tarm/serial"
 )
 
 // STR
@@ -124,6 +125,11 @@ func init() {
 		{42, 46, 49, 51, 53},
 		{43, 44, 45, 49, 52},
 	}
+}
+
+// Potential main working function
+func PotentialWorking(leonardo *serial.Port) {
+
 }
 
 // Detect potential result meet requirements or not

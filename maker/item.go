@@ -2,10 +2,8 @@ package maker
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/go-vgo/robotgo"
-	"github.com/tarm/serial"
 )
 
 var (
@@ -18,30 +16,6 @@ var (
 	ItemCountsX int
 	ItemCountsY int
 )
-
-// Move the cursor to item relative to LeftTop item
-func MoveToItem(leonardo *serial.Port, w, h int, latency time.Duration) {
-	command_toFirstItem := fmt.Sprintf("m%d,%d\n", LeftTopX, LeftTopY)
-	command_toRightItem := fmt.Sprintf("r%d,%d\n", RightDistance, 0)
-	command_toDownItem := fmt.Sprintf("r%d,%d\n", 0, DownDistance)
-
-	// Step0. move mouse to leftTop item
-	data := make([]byte, 128)
-	LeonardoEcho(leonardo, command_toFirstItem, data)
-	time.Sleep(time.Second)
-
-	// Step1: Horizontal movement
-	for i := 0; i < w; i++ {
-		LeonardoEcho(leonardo, command_toRightItem, data)
-		time.Sleep(latency * time.Millisecond)
-	}
-
-	// Step2: Vertical movement
-	for i := 0; i < h; i++ {
-		LeonardoEcho(leonardo, command_toDownItem, data)
-		time.Sleep(latency * time.Millisecond)
-	}
-}
 
 func ItemLocating(defaultDistance bool) {
 	fmt.Println("[Item] Note: you must put your items as a rectangle")
