@@ -19,41 +19,42 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == '1') {
-      DoubleJumpAttackA(KEY_RIGHT_ARROW, 3, 100, 'f', 'd', KEY_RIGHT_ARROW);
+      DoubleJumpAttackA(true, 'f', 'd');
     } else if (c == '2') {
-      JumpAttackA(KEY_LEFT_ARROW, 5, 500, 'f', 'd');
+      DoubleJumpAttackA(false, 'f', 'd');
     } else if (c == '3') {
-      DoubleJump('f', 'a', 100);
+      UpJump('f');
     }
   }
 }
 
-void DoubleJumpAttackA(char direction, int times, long latency, char jump, char attack, char useless) {
-  Keyboard.press(direction);
-  for (int i = 0; i < times; i++) {
-    DoubleJump(jump, useless, latency);
+
+void DoubleJumpAttackA(bool direction, char jump, char attack) {
+  if (direction == true) {
+    Keyboard.press(KEY_RIGHT_ARROW);
+  } else {
+    Keyboard.press(KEY_LEFT_ARROW);
+  }
+  for (int i = 0; i < 3; i++) {
+    DoubleJump(jump);
     delay(100);
     Keyboard.write(attack);
-    delay(1000);
+    delay(600); // 600 ~ 
   }
   Keyboard.releaseAll();
 }
 
-void JumpAttackA(char direction, int times, long latency, char jump, char attack) {
-  Keyboard.press(direction);
-  for (int i = 0; i < times; i++) {
-    Keyboard.write(jump);
-    delay(100);
-    Keyboard.write(attack);
-    delay(latency);
-  }
-  Keyboard.releaseAll();
-}
-
-void DoubleJump(char jump, char useless, long latency) {
+void DoubleJump(char jump) {
   Keyboard.write(jump);
-  delay(latency);
-  Keyboard.write(useless);
   delay(100);
   Keyboard.write(jump);
+  Keyboard.write(jump);
+}
+void UpJump(char jump) {
+  //Keyboard.press(KEY_UP_ARROW);
+  //Keyboard.press(jump);
+  //delay(100);
+  //Keyboard.release(jump);
+  //Keyboard.write(jump);
+  //Keyboard.releaseAll();
 }
