@@ -126,7 +126,7 @@ void loop() {
 
     } else if (c == 'e') {
       Serial.println("[Command] key enter");
-      KeyStroke(ENTER);
+      KeyStroke(10);
 
     } else if (c == 'k') {
       Serial.println("[Command] key something");
