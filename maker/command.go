@@ -12,8 +12,11 @@ var (
 	command_toMisticItem     string
 	command_toMisticConfirmA string
 	command_toMisticConfirmB string
-	command_toConsume        string
-	command_toPotentialCube  string
+
+	command_toConsume          string
+	command_toPotentialCube    string
+	command_toPotentialReuse   string
+	command_toPotentialConfirm string
 
 	command_singleClick string
 	command_doubleClick string
@@ -22,6 +25,8 @@ var (
 	command_toDownItem  string
 	// command_toLeftItem  string
 	// command_toUpItem    string
+
+	command_keyEnter string
 )
 
 // Initialize the command (Must called after updating global settings)
@@ -32,6 +37,8 @@ func CommandInit() {
 	command_toMisticConfirmB = fmt.Sprintf("m%d,%d\n", SecondConfirmX, SecondConfirmY)
 	command_toConsume = fmt.Sprintf("m%d,%d\n", ConsumeX, ConsumeY)
 	command_toPotentialCube = fmt.Sprintf("m%d,%d\n", PotentialCubeX, PotentialCubeY)
+	command_toPotentialReuse = fmt.Sprintf("m%d,%d\n", PotentialReuseX, PotentialReuseY)
+	command_toPotentialConfirm = fmt.Sprintf("m%d,%d\n", PotentialConfirmX, PotentialConfirmY)
 	command_singleClick = "s"
 	command_doubleClick = "d"
 
@@ -39,6 +46,8 @@ func CommandInit() {
 	command_toDownItem = fmt.Sprintf("r%d,%d\n", 0, DownDistance)
 	// command_toLeftItem = fmt.Sprintf("r%d,%d\n", -1*RightDistance, 0)
 	// command_toUpItem = fmt.Sprintf("r%d,%d\n", 0, -1*DownDistance)
+
+	command_keyEnter = "e"
 }
 
 // Move the cursor to item relative to LeftTop item

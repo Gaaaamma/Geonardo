@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
@@ -129,7 +130,36 @@ func init() {
 
 // Potential main working function
 func PotentialWorking(leonardo *serial.Port) {
+	data := make([]byte, 128)
+	for i := 0; i < ItemCountsX; i++ {
+		for j := 0; j < ItemCountsY; j++ {
+			// Invoke potential first
+			InvokePotentialCube(leonardo, 500)
 
+			// Move to target item and confirm
+			MoveToItem(leonardo, i, j, 200)
+			LeonardoEcho(leonardo, command_singleClick, data)
+			LeonardoEcho(leonardo, command_keyEnter, data)
+			LeonardoEcho(leonardo, command_keyEnter, data)
+			time.Sleep(1500 * time.Millisecond)
+
+			// Check item potential done
+			for !PotentialDetection() {
+				// Move to reuse button and click
+				LeonardoEcho(leonardo, command_toPotentialReuse, data)
+				LeonardoEcho(leonardo, command_singleClick, data)
+				LeonardoEcho(leonardo, command_keyEnter, data)
+				LeonardoEcho(leonardo, command_keyEnter, data)
+				LeonardoEcho(leonardo, command_keyEnter, data)
+				time.Sleep(1500 * time.Millisecond)
+			}
+
+			// Potential is done
+			LeonardoEcho(leonardo, command_toPotentialConfirm, data)
+			LeonardoEcho(leonardo, command_singleClick, data)
+			fmt.Printf("[Potential] potential is done\n")
+		}
+	}
 }
 
 // Detect potential result meet requirements or not
