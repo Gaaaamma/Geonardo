@@ -138,8 +138,14 @@ func PotentialWorking(leonardo *serial.Port) {
 
 			// Move to target item and confirm
 			MoveToItem(leonardo, i, j, 200)
+			time.Sleep(100 * time.Millisecond)
+
 			LeonardoEcho(leonardo, command_singleClick, data)
+			time.Sleep(100 * time.Millisecond)
+
 			LeonardoEcho(leonardo, command_keyEnter, data)
+			time.Sleep(100 * time.Millisecond)
+
 			LeonardoEcho(leonardo, command_keyEnter, data)
 			time.Sleep(1500 * time.Millisecond)
 
@@ -147,16 +153,26 @@ func PotentialWorking(leonardo *serial.Port) {
 			for !PotentialDetection() {
 				// Move to reuse button and click
 				LeonardoEcho(leonardo, command_toPotentialReuse, data)
+				time.Sleep(100 * time.Millisecond)
+
 				LeonardoEcho(leonardo, command_singleClick, data)
+				time.Sleep(100 * time.Millisecond)
+
 				LeonardoEcho(leonardo, command_keyEnter, data)
+				time.Sleep(100 * time.Millisecond)
+
 				LeonardoEcho(leonardo, command_keyEnter, data)
+				time.Sleep(100 * time.Millisecond)
+
 				LeonardoEcho(leonardo, command_keyEnter, data)
 				time.Sleep(1500 * time.Millisecond)
 			}
 
 			// Potential is done
 			LeonardoEcho(leonardo, command_toPotentialConfirm, data)
+			time.Sleep(100 * time.Millisecond)
 			LeonardoEcho(leonardo, command_singleClick, data)
+			time.Sleep(100 * time.Millisecond)
 			fmt.Printf("[Potential] potential is done\n")
 		}
 	}
