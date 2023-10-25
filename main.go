@@ -95,6 +95,9 @@ func main() {
 		} else if command == "4" { // SpecialToRare
 			maker.SpecialToRare(leonardo)
 
+		} else if command == "5" { // PotentialWorking
+			maker.PotentialWorking(leonardo)
+
 		} else if command == "0" { // Command for experiment
 			for {
 				maker.PotentialDetection()
