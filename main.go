@@ -26,8 +26,8 @@ func main() {
 
 	// Locating
 	maker.ItemLocating(true)
-	// maker.MysticLocating()
-	maker.PotentialLocating()
+	maker.MysticLocating()
+	// maker.PotentialLocating()
 
 	// Command initialization
 	maker.CommandInit()

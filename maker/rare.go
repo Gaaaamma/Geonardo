@@ -33,6 +33,9 @@ var (
 
 	MysticItemX int
 	MysticItemY int
+
+	MagnifierX int
+	MagnifierY int
 )
 
 func SpecialToRare(leonardo *serial.Port) {
@@ -89,6 +92,35 @@ func RareDetection() bool {
 	return false
 }
 
+// Use magnifier to check all items
+func Magnifiering(leonardo *serial.Port) {
+	for j := 0; j < ItemCountsY; j++ {
+		for i := 0; i < ItemCountsX; i++ {
+			Magnifier(leonardo, i, j)
+		}
+	}
+}
+
+func Magnifier(leonardo *serial.Port, x, y int) {
+	data := make([]byte, 128)
+
+	// Move cursor to magnifier and click
+	LeonardoEcho(leonardo, command_toMagnifier, data)
+	time.Sleep(200 * time.Millisecond)
+	LeonardoEcho(leonardo, command_singleClick, data)
+	time.Sleep(200 * time.Millisecond)
+
+	// Move cursor to item (x,y)
+	MoveToItem(leonardo, x, y, 200)
+	time.Sleep(100 * time.Millisecond)
+
+	// Use and confirm
+	LeonardoEcho(leonardo, command_singleClick, data)
+	time.Sleep(200 * time.Millisecond)
+	LeonardoEcho(leonardo, command_keyEnter, data)
+	time.Sleep(1000 * time.Millisecond)
+}
+
 func MysticLocating() {
 	// Money locating
 	for {
@@ -123,6 +155,14 @@ func MysticLocating() {
 		x, y := robotgo.GetMousePos()
 		SecondConfirmX = GetLeonardoX(x)
 		SecondConfirmY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step8: move cursor to magnifier")
+	fmt.Println("[Potential] Step9: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		MagnifierX = GetLeonardoX(x)
+		MagnifierY = GetLeonardoY(y)
 	}
 }
 
