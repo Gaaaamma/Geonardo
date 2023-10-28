@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/fatih/color"
 	"github.com/tarm/serial"
@@ -99,10 +98,7 @@ func main() {
 			maker.PotentialWorking(leonardo)
 
 		} else if command == "0" { // Command for experiment
-			for {
-				maker.PotentialDetection()
-				time.Sleep(500 * time.Millisecond)
-			}
+			maker.Magnifiering(leonardo)
 		}
 	}
 }

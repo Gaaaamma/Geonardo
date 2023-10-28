@@ -44,6 +44,9 @@ var (
 	RootX int
 	RootY int
 
+	MagnifierX int
+	MagnifierY int
+
 	YelloTopLineX []int
 	STR           [8][]int
 	INT           [8][]int
@@ -255,6 +258,35 @@ func WordCheck(word [8][]int) {
 	fmt.Println("")
 }
 
+func Magnifiering(leonardo *serial.Port) {
+	for j := 0; j < ItemCountsY; j++ {
+		for i := 0; i < ItemCountsX; i++ {
+			Magnifier(leonardo, i, j)
+		}
+	}
+}
+
+// Use magnifier to check all items
+func Magnifier(leonardo *serial.Port, x, y int) {
+	data := make([]byte, 128)
+
+	// Move cursor to magnifier and click
+	LeonardoEcho(leonardo, command_toMagnifier, data)
+	time.Sleep(200 * time.Millisecond)
+	LeonardoEcho(leonardo, command_singleClick, data)
+	time.Sleep(200 * time.Millisecond)
+
+	// Move cursor to item (x,y)
+	MoveToItem(leonardo, x, y, 200)
+	time.Sleep(100 * time.Millisecond)
+
+	// Use and confirm
+	LeonardoEcho(leonardo, command_singleClick, data)
+	time.Sleep(200 * time.Millisecond)
+	LeonardoEcho(leonardo, command_keyEnter, data)
+	time.Sleep(1000 * time.Millisecond)
+}
+
 // Set potential cube position
 func potentialLocating() {
 	fmt.Println("[Potential] Step1: move cursor to consume column")
@@ -290,16 +322,24 @@ func potentialLocating() {
 		PotentialConfirmY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Potential] Step10: move cursor to left-top of the result")
+	fmt.Println("[Potential] Step10: move cursor to magnifier")
 	fmt.Println("[Potential] Step11: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		MagnifierX = GetLeonardoX(x)
+		MagnifierY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step12: move cursor to left-top of the result")
+	fmt.Println("[Potential] Step13: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		PotentialStartX = GetWindowsX(x)
 		PotentialStartY = GetWindowsY(y)
 	}
 
-	fmt.Println("[Potential] Step12: move cursor to right-bottom of the result")
-	fmt.Println("[Potential] Step13: press 'y' to catch position")
+	fmt.Println("[Potential] Step14: move cursor to right-bottom of the result")
+	fmt.Println("[Potential] Step15: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		x = GetWindowsX(x)
@@ -308,7 +348,7 @@ func potentialLocating() {
 		PotentialHeight = y - PotentialStartY
 	}
 
-	fmt.Println("[Potential] Step14: confirm position of image 'potential.png' is correct")
+	fmt.Println("[Potential] Step16: confirm position of image 'potential.png' is correct")
 	GetImage(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight, "potential")
 }
 

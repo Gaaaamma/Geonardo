@@ -17,6 +17,7 @@ var (
 	command_toPotentialCube    string
 	command_toPotentialReuse   string
 	command_toPotentialConfirm string
+	command_toMagnifier        string
 
 	command_singleClick string
 	command_doubleClick string
@@ -39,6 +40,8 @@ func CommandInit() {
 	command_toPotentialCube = fmt.Sprintf("m%d,%d\n", PotentialCubeX, PotentialCubeY)
 	command_toPotentialReuse = fmt.Sprintf("m%d,%d\n", PotentialReuseX, PotentialReuseY)
 	command_toPotentialConfirm = fmt.Sprintf("m%d,%d\n", PotentialConfirmX, PotentialConfirmY)
+	command_toMagnifier = fmt.Sprintf("m%d,%d\n", MagnifierX, MagnifierY)
+
 	command_singleClick = "s"
 	command_doubleClick = "d"
 
