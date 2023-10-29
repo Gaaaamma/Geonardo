@@ -5,8 +5,14 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
 	"github.com/tarm/serial"
+)
+
+const (
+	MYSTIC_FIRST_DISTANCE = 3
+	MYSTIC_EN_DISTANCE    = 5
 )
 
 var (
@@ -36,6 +42,15 @@ var (
 
 	MagnifierX int
 	MagnifierY int
+
+	LayerStartX int
+	LayerStartY int
+	LayerEndX   int
+	LayerEndY   int
+	LayerWidth  int
+	LayerHeight int
+	LayerRootX  int
+	LayerRootY  int
 )
 
 func SpecialToRare(leonardo *serial.Port) {
@@ -125,7 +140,16 @@ func MysticLocating() {
 	// Money locating
 	for {
 		if err := moneyLocating(); err != nil {
-			fmt.Println(err)
+			color.Red("%s", err)
+			continue
+		}
+		break
+	}
+
+	// Layer locacting
+	for {
+		if err := layerLocating(); err != nil {
+			color.Red("%s", err)
 			continue
 		}
 		break
@@ -224,4 +248,56 @@ func rareMoneyFind() error {
 		}
 	}
 	return fmt.Errorf("[Fail] didn't find rare first '1'")
+}
+
+func layerLocating() error {
+	fmt.Println("[Layer] Step0: put a rare item in the mystic cube")
+	fmt.Println("[Layer] Step1: move cursor to left-top of the potential result")
+	fmt.Println("[Layer] Step2: press 'y' to catch start position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		LayerStartX = GetWindowsX(x)
+		LayerStartY = GetWindowsY(y)
+	}
+
+	fmt.Println("[Layer] Step3: move cursor to right-bottom of the potential result")
+	fmt.Println("[Layer] Step4: press 'y' to catch end position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		LayerEndX = GetWindowsX(x)
+		LayerEndY = GetWindowsY(y)
+	}
+
+	LayerWidth = LayerEndX - LayerStartX
+	LayerHeight = LayerEndY - LayerStartY
+	GetImage(LayerStartX, LayerStartY, LayerWidth, LayerHeight, "LayerDetection")
+
+	// Find LayerRootX & LayerRootY
+	return findRoot("Layer", LayerStartX, LayerStartY, LayerWidth, LayerHeight, MYSTIC_FIRST_DISTANCE, &LayerRootX, &LayerRootY)
+}
+
+// Use LayerRootX & LayerRootY to check potential layers of this item
+func LayerDetection() int {
+	counter := 0
+	bit := robotgo.CaptureScreen(LayerStartX, LayerStartY, LayerWidth, LayerHeight)
+	rgba := robotgo.ToRGBA(bit)
+	robotgo.FreeBitmap(bit)
+
+	for i := 0; i < 3; i++ {
+		rootX := LayerRootX
+		rootY := LayerRootY + i*(EN_HEIGHT+MYSTIC_EN_DISTANCE) + (EN_HEIGHT)/2 // Y is at half of the potential result
+
+		// Check Dx/4 to check if there is any words or not
+		for w := 0; w < rgba.Bounds().Dx()/4; w++ {
+			r, g, b, _ := rgba.At(rootX+w, rootY).RGBA()
+			r8 := (uint8)(r >> 8)
+			g8 := (uint8)(g >> 8)
+			b8 := (uint8)(b >> 8)
+			if isWhite(r8, g8, b8) {
+				counter += 1
+				break
+			}
+		}
+	}
+	return counter
 }

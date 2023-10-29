@@ -27,7 +27,7 @@ func main() {
 	// Locating
 	maker.ItemLocating(true)
 	maker.MysticLocating()
-	// maker.PotentialLocating()
+	maker.PotentialLocating()
 
 	// Command initialization
 	maker.CommandInit()
@@ -98,7 +98,7 @@ func main() {
 			maker.PotentialWorking(leonardo)
 
 		} else if command == "0" { // Command for experiment
-			maker.Magnifiering(leonardo)
+			fmt.Printf("[Layer] layer counts: %d\n", maker.LayerDetection())
 		}
 	}
 }

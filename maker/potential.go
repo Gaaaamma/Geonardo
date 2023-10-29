@@ -225,7 +225,7 @@ func PotentialDetection() bool {
 func PotentialLocating() {
 	for {
 		potentialLocating()
-		if err := findRoot(); err != nil {
+		if err := findRoot("Potential", PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight, RARE_FIRST_DISTANCE, &RootX, &RootY); err != nil {
 			color.Red("%s", err)
 			continue
 		}
@@ -313,24 +313,24 @@ func potentialLocating() {
 }
 
 // Find the reference position of attribute words (STR/INT/DEX/LUK)
-func findRoot() error {
-	bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
+func findRoot(prefix string, startX, startY, width, height, offsetY int, rootX, rootY *int) error {
+	bit := robotgo.CaptureScreen(startX, startY, width, height)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 
-	if !findRootX(rgba) {
-		return fmt.Errorf("[Potential] find RootX failed")
+	if !findRootX(rgba, rootX) {
+		return fmt.Errorf("[%s] find RootX failed", prefix)
 	}
-	if !findRootY(rgba) {
-		return fmt.Errorf("[Potential] find RootY failed")
+	if !findRootY(rgba, offsetY, rootY) {
+		return fmt.Errorf("[%s] find RootY failed", prefix)
 	}
-	color.Green("[Potential] find (RootX, RootY) = (%d, %d)", RootX, RootY)
+	color.Green("[%s] find (RootX, RootY) = (%d, %d)", prefix, *rootX, *rootY)
 	return nil
 }
 
 // Use white point to find the position of RootX.
 // X must not equals to 0 which represents user cut a bad graph
-func findRootX(rgba *image.RGBA) bool {
+func findRootX(rgba *image.RGBA, rootX *int) bool {
 	for x := 0; x < rgba.Bounds().Dx(); x++ {
 		for y := 0; y < rgba.Bounds().Dy(); y++ {
 			r, g, b, _ := rgba.At(x, y).RGBA()
@@ -340,7 +340,7 @@ func findRootX(rgba *image.RGBA) bool {
 
 			if isWhite(r8, g8, b8) { // Find "white" point
 				// Further check x must not equals to 0 (represent user cut a bad graph to be identified)
-				RootX = x
+				*rootX = x
 				return x != 0
 			}
 		}
@@ -350,7 +350,7 @@ func findRootX(rgba *image.RGBA) bool {
 
 // Use top line of yellow words ("稀有") to find the position of RootY.
 // User must cut the whole word ("稀有") or the function will fail
-func findRootY(rgba *image.RGBA) bool {
+func findRootY(rgba *image.RGBA, offset int, rootY *int) bool {
 	for y := 0; y < rgba.Bounds().Dy(); y++ {
 		for x := 0; x < rgba.Bounds().Dx(); x++ {
 			r, g, b, _ := rgba.At(x, y).RGBA()
@@ -376,7 +376,7 @@ func findRootY(rgba *image.RGBA) bool {
 				r8 := (uint8)(r >> 8)
 				g8 := (uint8)(g >> 8)
 				b8 := (uint8)(b >> 8)
-				RootY = y + ZN_HEIGHT + RARE_FIRST_DISTANCE
+				*rootY = y + ZN_HEIGHT + offset
 				return isYellow(r8, g8, b8)
 			}
 		}
