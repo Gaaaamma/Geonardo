@@ -131,8 +131,8 @@ func init() {
 // Potential main working function
 func PotentialWorking(leonardo *serial.Port) {
 	data := make([]byte, 128)
-	for i := 0; i < ItemCountsX; i++ {
-		for j := 0; j < ItemCountsY; j++ {
+	for j := 0; j < ItemCountsY; j++ {
+		for i := 0; i < ItemCountsX; i++ {
 			// Invoke potential first
 			InvokePotentialCube(leonardo, 500)
 
