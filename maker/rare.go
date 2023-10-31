@@ -55,6 +55,9 @@ var (
 
 func SpecialToRare(leonardo *serial.Port) {
 	data := make([]byte, 128)
+	// Step0: Magnifiering is needed to make dragging to mystic cube possible
+	Magnifiering(leonardo)
+
 	for j := 0; j < ItemCountsY; j++ {
 		for i := 0; i < ItemCountsX; i++ {
 			// Step1: Move to the item
@@ -68,23 +71,38 @@ func SpecialToRare(leonardo *serial.Port) {
 			LeonardoEcho(leonardo, command_singleClick, data)
 			time.Sleep(time.Second)
 
-			// Step3: Rare detection and works
+			// Step3: Use layer counts to check we need to go ahead or not
+			layers := LayerDetection()
+			if layers == 2 { // Layer 2 will be dropped directly
+				continue
+			}
+
+			// Step4: Rare detection and works
 			for !RareDetection() {
-				// Special item
-				// Step4: Move to First confirm button and click
+				// Step4-1: layers 0 needs to do one time to check layers
+				if layers == 0 {
+					layers = LayerDetection()
+					if layers == 2 {
+						break
+					}
+				}
+
+				// Step4-2: Move to First confirm button and click
 				sleep := rand.Intn(30) + 10
 				LeonardoEcho(leonardo, command_toMisticConfirmA, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 				LeonardoEcho(leonardo, command_singleClick, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 
-				// Step5: Move to Second confirm button and click
+				// Step4-3: Move to Second confirm button and click
 				LeonardoEcho(leonardo, command_toMisticConfirmB, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 				LeonardoEcho(leonardo, command_singleClick, data)
 				time.Sleep(900 * time.Millisecond)
 			}
-			fmt.Printf("[Rare] it is rare now\n")
+			if layers == 3 {
+				fmt.Printf("[Rare] it is rare now\n")
+			}
 		}
 	}
 }
