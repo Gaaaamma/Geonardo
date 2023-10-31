@@ -19,10 +19,11 @@ import (
 
 const (
 	EN_HEIGHT           = 8
-	ZN_HEIGHT           = 12
+	ZH_HEIGHT           = 12
 	EN_DISTANCE         = 6
 	RARE_FIRST_DISTANCE = 4
 	POTENTIAL_TARGET    = 9
+	FAIL_THRESHOLD      = 3
 )
 
 var (
@@ -43,6 +44,9 @@ var (
 
 	RootX int
 	RootY int
+
+	RareZhX int
+	RareZhY int
 
 	YelloTopLineX []int
 	STR           [8][]int
@@ -150,7 +154,14 @@ func PotentialWorking(leonardo *serial.Port) {
 			time.Sleep(1500 * time.Millisecond)
 
 			// Check item potential done
-			for !PotentialDetection() {
+			fail := 0
+			for !PotentialDetection(&fail) {
+				// fail check
+				if fail >= FAIL_THRESHOLD {
+					i--
+					break
+				}
+
 				// Move to reuse button and click
 				LeonardoEcho(leonardo, command_toPotentialReuse, data)
 				time.Sleep(100 * time.Millisecond)
@@ -179,11 +190,19 @@ func PotentialWorking(leonardo *serial.Port) {
 }
 
 // Detect potential result meet requirements or not
-func PotentialDetection() bool {
+func PotentialDetection(fail *int) bool {
 	bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 
+	// fail check
+	if !rareZhDetection(rgba, RareZhX, RareZhY) {
+		// The graph isn't potential yet
+		*fail += 1
+		return false
+	}
+
+	*fail = 0 // reset fail counter to 0 if success
 	potential := make(map[string]int)
 	attrs := []string{"STR", "INT", "DEX", "LUK", "ALL"}
 
@@ -353,31 +372,13 @@ func findRootX(rgba *image.RGBA, rootX *int) bool {
 func findRootY(rgba *image.RGBA, offset int, rootY *int) bool {
 	for y := 0; y < rgba.Bounds().Dy(); y++ {
 		for x := 0; x < rgba.Bounds().Dx(); x++ {
-			r, g, b, _ := rgba.At(x, y).RGBA()
-			r8 := (uint8)(r >> 8)
-			g8 := (uint8)(g >> 8)
-			b8 := (uint8)(b >> 8)
-
-			if isYellow(r8, g8, b8) { // Find "yellow" point
-				// Need to further check it is the top line of "稀有"
-				if x+YelloTopLineX[len(YelloTopLineX)-1] >= rgba.Bounds().Dx() || y+1 >= rgba.Bounds().Dy() {
-					return false
+			if rareZhDetection(rgba, x, y) {
+				if offset == RARE_FIRST_DISTANCE { // Further set RareZhX & RareZhY
+					RareZhX = x
+					RareZhY = y
 				}
-				for i := 0; i < len(YelloTopLineX); i++ {
-					r, g, b, _ = rgba.At(x+YelloTopLineX[i], y).RGBA()
-					r8 := (uint8)(r >> 8)
-					g8 := (uint8)(g >> 8)
-					b8 := (uint8)(b >> 8)
-					if !isYellow(r8, g8, b8) {
-						return false
-					}
-				}
-				r, g, b, _ = rgba.At(x+YelloTopLineX[len(YelloTopLineX)-1], y+1).RGBA()
-				r8 := (uint8)(r >> 8)
-				g8 := (uint8)(g >> 8)
-				b8 := (uint8)(b >> 8)
-				*rootY = y + ZN_HEIGHT + offset
-				return isYellow(r8, g8, b8)
+				*rootY = y + ZH_HEIGHT + offset
+				return true
 			}
 		}
 	}
@@ -455,4 +456,37 @@ func percentDetection(rootX, rootY int, rgba *image.RGBA, percent int) (int, err
 		}
 	}
 	return percent, nil
+}
+
+// Check if (x, y) is the first point of top line of "稀有"
+func rareZhDetection(rgba *image.RGBA, x, y int) bool {
+	r, g, b, _ := rgba.At(x, y).RGBA()
+	r8 := (uint8)(r >> 8)
+	g8 := (uint8)(g >> 8)
+	b8 := (uint8)(b >> 8)
+
+	if isYellow(r8, g8, b8) { // Find "yellow" point
+		// Need to further check it is the top line of "稀有"
+		if x+YelloTopLineX[len(YelloTopLineX)-1] >= rgba.Bounds().Dx() || y+1 >= rgba.Bounds().Dy() {
+			return false
+		}
+
+		// Top line all points check
+		for i := 0; i < len(YelloTopLineX); i++ {
+			r, g, b, _ = rgba.At(x+YelloTopLineX[i], y).RGBA()
+			r8 := (uint8)(r >> 8)
+			g8 := (uint8)(g >> 8)
+			b8 := (uint8)(b >> 8)
+			if !isYellow(r8, g8, b8) {
+				return false
+			}
+		}
+		// Check the point under last point
+		r, g, b, _ = rgba.At(x+YelloTopLineX[len(YelloTopLineX)-1], y+1).RGBA()
+		r8 := (uint8)(r >> 8)
+		g8 := (uint8)(g >> 8)
+		b8 := (uint8)(b >> 8)
+		return isYellow(r8, g8, b8)
+	}
+	return false
 }
