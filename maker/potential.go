@@ -24,6 +24,8 @@ const (
 	RARE_FIRST_DISTANCE = 4
 	POTENTIAL_TARGET    = 9
 	FAIL_THRESHOLD      = 3
+	SORT_STACK_X        = 1000
+	SORT_STACK_Y        = 1000
 )
 
 var (
@@ -47,6 +49,9 @@ var (
 
 	RareZhX int
 	RareZhY int
+
+	SortX int
+	SortY int
 
 	YelloTopLineX []int
 	STR           [8][]int
@@ -185,6 +190,10 @@ func PotentialWorking(leonardo *serial.Port) {
 			LeonardoEcho(leonardo, command_singleClick, data)
 			time.Sleep(100 * time.Millisecond)
 			fmt.Printf("[Potential] potential is done\n")
+
+			// Stack concume items to make potential cube recovery
+			StackConsumeItems(leonardo)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
@@ -284,41 +293,49 @@ func potentialLocating() {
 		ConsumeY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Potential] Step3: move cursor to potential cube")
+	fmt.Println("[Potential] Step3: move cursor to sort button")
 	fmt.Println("[Potential] Step4: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		SortX = GetLeonardoX(x)
+		SortY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step5: move cursor to potential cube")
+	fmt.Println("[Potential] Step6: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		PotentialCubeX = GetLeonardoX(x)
 		PotentialCubeY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Potential] Step5: use cube to get first potential result")
-	fmt.Println("[Potential] Step6: move cursor to potential reuse button")
-	fmt.Println("[Potential] Step7: press 'y' to catch position")
+	fmt.Println("[Potential] Step7: use cube to get first potential result")
+	fmt.Println("[Potential] Step8: move cursor to potential reuse button")
+	fmt.Println("[Potential] Step9: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		PotentialReuseX = GetLeonardoX(x)
 		PotentialReuseY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Potential] Step8: move cursor to potential confirm button")
-	fmt.Println("[Potential] Step9: press 'y' to catch position")
+	fmt.Println("[Potential] Step10: move cursor to potential confirm button")
+	fmt.Println("[Potential] Step11: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		PotentialConfirmX = GetLeonardoX(x)
 		PotentialConfirmY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Potential] Step10: move cursor to left-top of the result")
-	fmt.Println("[Potential] Step11: press 'y' to catch position")
+	fmt.Println("[Potential] Step12: move cursor to left-top of the result")
+	fmt.Println("[Potential] Step13: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		PotentialStartX = GetWindowsX(x)
 		PotentialStartY = GetWindowsY(y)
 	}
 
-	fmt.Println("[Potential] Step12: move cursor to right-bottom of the result")
-	fmt.Println("[Potential] Step13: press 'y' to catch position")
+	fmt.Println("[Potential] Step14: move cursor to right-bottom of the result")
+	fmt.Println("[Potential] Step15: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		x = GetWindowsX(x)
@@ -327,7 +344,7 @@ func potentialLocating() {
 		PotentialHeight = y - PotentialStartY
 	}
 
-	fmt.Println("[Potential] Step14: confirm position of image 'potential.png' is correct")
+	fmt.Println("[Potential] Step16: confirm position of image 'potential.png' is correct")
 	GetImage(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight, "potential")
 }
 

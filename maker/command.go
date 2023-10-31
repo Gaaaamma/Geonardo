@@ -18,6 +18,8 @@ var (
 	command_toPotentialReuse   string
 	command_toPotentialConfirm string
 	command_toMagnifier        string
+	command_toSort             string
+	command_sortToStack        string
 
 	command_singleClick string
 	command_doubleClick string
@@ -41,6 +43,8 @@ func CommandInit() {
 	command_toPotentialReuse = fmt.Sprintf("m%d,%d\n", PotentialReuseX, PotentialReuseY)
 	command_toPotentialConfirm = fmt.Sprintf("m%d,%d\n", PotentialConfirmX, PotentialConfirmY)
 	command_toMagnifier = fmt.Sprintf("m%d,%d\n", MagnifierX, MagnifierY)
+	command_toSort = fmt.Sprintf("m%d,%d\n", SortX, SortY)
+	command_sortToStack = fmt.Sprintf("r%d,%d\n", SORT_STACK_X, SORT_STACK_Y)
 
 	command_singleClick = "s"
 	command_doubleClick = "d"
@@ -86,5 +90,23 @@ func InvokePotentialCube(leonardo *serial.Port, latency time.Duration) {
 	for _, command := range commands {
 		LeonardoEcho(leonardo, command, data)
 		time.Sleep(latency * time.Millisecond)
+	}
+}
+
+// Stack consume items
+func StackConsumeItems(leonardo *serial.Port) {
+	commands := []string{
+		command_toConsume,
+		command_singleClick,
+		command_toSort,
+		command_singleClick,
+		command_sortToStack,
+		command_singleClick,
+	}
+
+	data := make([]byte, 128)
+	for _, command := range commands {
+		LeonardoEcho(leonardo, command, data)
+		time.Sleep(200 * time.Millisecond)
 	}
 }

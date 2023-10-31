@@ -98,7 +98,7 @@ func main() {
 			maker.PotentialWorking(leonardo)
 
 		} else if command == "0" { // Command for experiment
-			fmt.Printf("[Layer] layer counts: %d\n", maker.LayerDetection())
+			maker.StackConsumeItems(leonardo)
 		}
 	}
 }
