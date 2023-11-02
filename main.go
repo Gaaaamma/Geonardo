@@ -98,7 +98,7 @@ func main() {
 			maker.PotentialWorking(leonardo)
 
 		} else if command == "0" { // Command for experiment
-			maker.StackConsumeItems(leonardo)
+			maker.Creating(leonardo, 900)
 		}
 	}
 }

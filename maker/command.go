@@ -2,6 +2,7 @@ package maker
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/tarm/serial"
@@ -20,6 +21,8 @@ var (
 	command_toMagnifier        string
 	command_toSort             string
 	command_sortToStack        string
+	command_toCreate           string
+	command_toCreateDone       string
 
 	command_singleClick string
 	command_doubleClick string
@@ -45,6 +48,8 @@ func CommandInit() {
 	command_toMagnifier = fmt.Sprintf("m%d,%d\n", MagnifierX, MagnifierY)
 	command_toSort = fmt.Sprintf("m%d,%d\n", SortX, SortY)
 	command_sortToStack = fmt.Sprintf("r%d,%d\n", SORT_STACK_X, SORT_STACK_Y)
+	command_toCreate = fmt.Sprintf("m%d,%d\n", CreateX, CreateY)
+	command_toCreateDone = fmt.Sprintf("m%d,%d\n", CreateDoneX, CreateDoneY)
 
 	command_singleClick = "s"
 	command_doubleClick = "d"
@@ -108,5 +113,23 @@ func StackConsumeItems(leonardo *serial.Port) {
 	for _, command := range commands {
 		LeonardoEcho(leonardo, command, data)
 		time.Sleep(200 * time.Millisecond)
+	}
+}
+
+func CreateItem(leonardo *serial.Port, createDelay time.Duration) {
+	commands := []string{
+		command_toCreate,
+		command_singleClick,
+		command_keyEnter,
+		command_toCreateDone, // Need to wait a moment for item done
+		command_singleClick,
+	}
+	data := make([]byte, 128)
+	for _, command := range commands {
+		if strings.Compare(command, command_toCreateDone) == 0 {
+			time.Sleep(10 * time.Second)
+		}
+		LeonardoEcho(leonardo, command, data)
+		time.Sleep(createDelay * time.Millisecond)
 	}
 }
