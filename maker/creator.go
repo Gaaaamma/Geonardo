@@ -22,7 +22,7 @@ func creatorLocating() {
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		CreateX = GetLeonardoX(x)
-		CreateX = GetLeonardoY(y)
+		CreateY = GetLeonardoY(y)
 	}
 
 	fmt.Println("[Creator] Step3: create this item to get create done button")
@@ -36,25 +36,12 @@ func creatorLocating() {
 }
 
 func Creating(leonardo *serial.Port, period time.Duration) {
-	fmt.Println("[Creator] Step1: move cursor to create button")
-	fmt.Println("[Creator] Step2: press 'y' to catch position")
-	if robotgo.AddEvent("y") {
-		x, y := robotgo.GetMousePos()
-		CreateX = GetLeonardoX(x)
-		CreateX = GetLeonardoY(y)
-	}
+	// After locating -> command init
+	creatorLocating()
+	CommandInit()
 
-	fmt.Println("[Creator] Step3: create this item to get create done button")
-	fmt.Println("[Creator] Step4: move cursor to create done button")
-	fmt.Println("[Creator] Step5: press 'y' to catch position")
-	if robotgo.AddEvent("y") {
-		x, y := robotgo.GetMousePos()
-		CreateDoneX = GetLeonardoX(x)
-		CreateDoneY = GetLeonardoY(y)
-	}
-
-	fmt.Println("[Creator] Step6: make sure you are at correct item to be created")
-	fmt.Println("[Creator] Step7: input the number of items to be created")
+	fmt.Println("[Creator] Step1: make sure you are at correct item to be created")
+	fmt.Print("[Creator] Step2: input the number of items to be created: ")
 	counts := 0
 	fmt.Scan(&counts)
 	if counts > 0 && counts < 100 {
