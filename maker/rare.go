@@ -77,36 +77,37 @@ func SpecialToRare(leonardo *serial.Port) []int {
 			LeonardoEcho(leonardo, command_singleClick, data)
 			time.Sleep(time.Second)
 
-			// Step3: Use layer counts to check we need to go ahead or not
+			// Step3: Use layer numbers to check whether we need to go ahead or not
 			layers := LayerDetection()
 			if layers == 2 { // Layer 2 will be dropped directly
 				ignore = append(ignore, index)
 				continue
 			}
 
+			// Only layers = 0 || layers = 3 can pass
 			// Step4: Rare detection and works
 			for !RareDetection() {
-				// Step4-1: layers 0 needs to do one time to check layers
-				if layers == 0 {
-					layers = LayerDetection()
-					if layers == 2 {
-						ignore = append(ignore, index)
-						break
-					}
-				}
-
-				// Step4-2: Move to First confirm button and click
+				// Step4-1: Move to First confirm button and click
 				sleep := rand.Intn(30) + 10
 				LeonardoEcho(leonardo, command_toMisticConfirmA, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 				LeonardoEcho(leonardo, command_singleClick, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 
-				// Step4-3: Move to Second confirm button and click
+				// Step4-2: Move to Second confirm button and click
 				LeonardoEcho(leonardo, command_toMisticConfirmB, data)
 				time.Sleep(time.Duration(sleep) * time.Millisecond)
 				LeonardoEcho(leonardo, command_singleClick, data)
 				time.Sleep(900 * time.Millisecond)
+
+				// Step4-3: layers 0 needs to check layers after one iteration
+				if layers == 0 {
+					layers = LayerDetection()
+					if layers == 2 { // layer 2 item will be dropped
+						ignore = append(ignore, index)
+						break
+					}
+				}
 			}
 			if layers == 3 {
 				fmt.Printf("[Rare] it is rare now\n")
