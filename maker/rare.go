@@ -37,6 +37,9 @@ var (
 	SecondConfirmX int
 	SecondConfirmY int
 
+	MysticCancelX int
+	MysticCancelY int
+
 	MysticItemX int
 	MysticItemY int
 
@@ -110,6 +113,9 @@ func SpecialToRare(leonardo *serial.Port) []int {
 			}
 		}
 	}
+	// Step5: Close mystic cube UI
+	CloseMysticCube(leonardo)
+
 	color.Green("[Rare] SpecialToRare ignore: %v", ignore)
 	return ignore
 }
@@ -206,8 +212,16 @@ func MysticLocating() {
 		SecondConfirmY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Potential] Step8: move cursor to magnifier")
-	fmt.Println("[Potential] Step9: press 'y' to catch position")
+	fmt.Println("[Mystic] Step8: move cursor to cancel button")
+	fmt.Println("[Mystic] Step9: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		MysticCancelX = GetLeonardoX(x)
+		MysticCancelY = GetLeonardoY(y)
+	}
+
+	fmt.Println("[Potential] Step10: move cursor to magnifier")
+	fmt.Println("[Potential] Step11: press 'y' to catch position")
 	if robotgo.AddEvent("y") {
 		x, y := robotgo.GetMousePos()
 		MagnifierX = GetLeonardoX(x)

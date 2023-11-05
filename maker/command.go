@@ -13,6 +13,7 @@ var (
 	command_toMisticItem     string
 	command_toMisticConfirmA string
 	command_toMisticConfirmB string
+	command_toMysticCancel   string
 
 	command_toConsume          string
 	command_toPotentialCube    string
@@ -41,6 +42,8 @@ func CommandInit() {
 	command_toMisticItem = fmt.Sprintf("m%d,%d\n", MysticItemX, MysticItemY)
 	command_toMisticConfirmA = fmt.Sprintf("m%d,%d\n", FirstConfirmX, FirstConfirmY)
 	command_toMisticConfirmB = fmt.Sprintf("m%d,%d\n", SecondConfirmX, SecondConfirmY)
+	command_toMysticCancel = fmt.Sprintf("m%d,%d\n", MysticCancelX, MysticCancelY)
+
 	command_toConsume = fmt.Sprintf("m%d,%d\n", ConsumeX, ConsumeY)
 	command_toPotentialCube = fmt.Sprintf("m%d,%d\n", PotentialCubeX, PotentialCubeY)
 	command_toPotentialReuse = fmt.Sprintf("m%d,%d\n", PotentialReuseX, PotentialReuseY)
@@ -79,6 +82,20 @@ func MoveToItem(leonardo *serial.Port, x, y int, latency time.Duration) {
 	for i := 0; i < y; i++ {
 		LeonardoEcho(leonardo, command_toDownItem, data)
 		time.Sleep(latency * time.Millisecond)
+	}
+}
+
+// Close mystic cube UI
+func CloseMysticCube(leonardo *serial.Port) {
+	commands := []string{
+		command_toMysticCancel,
+		command_singleClick,
+	}
+
+	data := make([]byte, 128)
+	for _, command := range commands {
+		LeonardoEcho(leonardo, command, data)
+		time.Sleep(1000 * time.Millisecond)
 	}
 }
 
