@@ -53,13 +53,16 @@ var (
 	LayerRootY  int
 )
 
-func SpecialToRare(leonardo *serial.Port) {
+func SpecialToRare(leonardo *serial.Port) []int {
+	ignore := []int{}
 	data := make([]byte, 128)
+
 	// Step0: Magnifiering is needed to make dragging to mystic cube possible
 	Magnifiering(leonardo)
 
 	for j := 0; j < ItemCountsY; j++ {
 		for i := 0; i < ItemCountsX; i++ {
+			index := i + j*ItemCountsX
 			// Step1: Move to the item
 			MoveToItem(leonardo, i, j, 200)
 
@@ -74,6 +77,7 @@ func SpecialToRare(leonardo *serial.Port) {
 			// Step3: Use layer counts to check we need to go ahead or not
 			layers := LayerDetection()
 			if layers == 2 { // Layer 2 will be dropped directly
+				ignore = append(ignore, index)
 				continue
 			}
 
@@ -83,6 +87,7 @@ func SpecialToRare(leonardo *serial.Port) {
 				if layers == 0 {
 					layers = LayerDetection()
 					if layers == 2 {
+						ignore = append(ignore, index)
 						break
 					}
 				}
@@ -105,6 +110,8 @@ func SpecialToRare(leonardo *serial.Port) {
 			}
 		}
 	}
+	color.Green("[Rare] SpecialToRare ignore: %v", ignore)
+	return ignore
 }
 
 func RareDetection() bool {

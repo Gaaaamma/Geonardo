@@ -116,6 +116,7 @@ func StackConsumeItems(leonardo *serial.Port) {
 	}
 }
 
+// Create specific item in createDelay period
 func CreateItem(leonardo *serial.Port, createDelay time.Duration) {
 	commands := []string{
 		command_toCreate,

@@ -138,10 +138,18 @@ func init() {
 }
 
 // Potential main working function
-func PotentialWorking(leonardo *serial.Port) {
+func PotentialWorking(leonardo *serial.Port, ignore []int) {
 	data := make([]byte, 128)
 	for j := 0; j < ItemCountsY; j++ {
 		for i := 0; i < ItemCountsX; i++ {
+			// Ignore item of specific index
+			index := i + j*ItemCountsX
+			if len(ignore) != 0 && index == ignore[0] {
+				// Remove first item in ignore and continue to next round
+				ignore = ignore[1:]
+				continue
+			}
+
 			// Invoke potential first
 			InvokePotentialCube(leonardo, 500)
 

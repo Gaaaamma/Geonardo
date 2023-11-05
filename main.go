@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/tarm/serial"
@@ -76,6 +77,11 @@ func main() {
 			// Need to update the command
 			maker.CommandInit()
 
+		} else if command == "work" { // A complete working procedure
+			ignore := maker.SpecialToRare(leonardo)
+			time.Sleep(3 * time.Second)
+			maker.PotentialWorking(leonardo, ignore)
+
 		} else if command == "1" { // Move cursor to left-top item
 			color.Cyan("[User] command: move cursor to left-top item\n")
 			command = fmt.Sprintf("m%d,%d\n", maker.LeftTopX, maker.LeftTopY)
@@ -94,8 +100,8 @@ func main() {
 		} else if command == "4" { // SpecialToRare
 			maker.SpecialToRare(leonardo)
 
-		} else if command == "5" { // PotentialWorking
-			maker.PotentialWorking(leonardo)
+		} else if command == "5" { // PotentialWorking with no ignore
+			maker.PotentialWorking(leonardo, []int{})
 
 		} else if command == "0" { // Command for experiment
 			maker.Creating(leonardo, 900)
