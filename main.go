@@ -78,7 +78,7 @@ func main() {
 			maker.CommandInit()
 
 		} else if command == "work" { // A complete working procedure
-			ignore := maker.SpecialToRare(leonardo)
+			ignore := maker.SpecialToRare(leonardo, true)
 			time.Sleep(3 * time.Second)
 			maker.PotentialWorking(leonardo, ignore)
 
@@ -98,7 +98,7 @@ func main() {
 			maker.LeonardoEcho(leonardo, command, data)
 
 		} else if command == "4" { // SpecialToRare
-			maker.SpecialToRare(leonardo)
+			maker.SpecialToRare(leonardo, true)
 
 		} else if command == "5" { // PotentialWorking with no ignore
 			maker.PotentialWorking(leonardo, []int{})

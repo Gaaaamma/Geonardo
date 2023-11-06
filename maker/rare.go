@@ -56,7 +56,7 @@ var (
 	LayerRootY  int
 )
 
-func SpecialToRare(leonardo *serial.Port) []int {
+func SpecialToRare(leonardo *serial.Port, checkLayer bool) []int {
 	ignore := []int{}
 	data := make([]byte, 128)
 
@@ -79,7 +79,7 @@ func SpecialToRare(leonardo *serial.Port) []int {
 
 			// Step3: Use layer numbers to check whether we need to go ahead or not
 			layers := LayerDetection()
-			if layers == 2 { // Layer 2 will be dropped directly
+			if checkLayer && layers == 2 { // Layer 2 will be dropped directly
 				ignore = append(ignore, index)
 				continue
 			}
@@ -101,7 +101,7 @@ func SpecialToRare(leonardo *serial.Port) []int {
 				time.Sleep(900 * time.Millisecond)
 
 				// Step4-3: layers 0 needs to check layers after one iteration
-				if layers == 0 {
+				if checkLayer && layers == 0 {
 					layers = LayerDetection()
 					if layers == 2 { // layer 2 item will be dropped
 						ignore = append(ignore, index)
@@ -109,7 +109,7 @@ func SpecialToRare(leonardo *serial.Port) []int {
 					}
 				}
 			}
-			if layers == 3 {
+			if !checkLayer || layers == 3 {
 				fmt.Printf("[Rare] it is rare now\n")
 			}
 		}
