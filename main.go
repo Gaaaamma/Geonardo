@@ -80,7 +80,20 @@ func main() {
 		} else if command == "work" { // A complete working procedure
 			ignore := maker.SpecialToRare(leonardo, true)
 			time.Sleep(3 * time.Second)
-			maker.PotentialWorking(leonardo, ignore)
+			maker.PotentialWorking(leonardo, ignore, []string{"STR", "INT", "DEX", "LUK", "ALL"}, maker.POTENTIAL_TARGET)
+
+		} else if command == "create" {
+			maker.Creating(leonardo, 900)
+
+		} else if command == "weaponPHY" {
+			maker.SpecialToRare(leonardo, false)
+			time.Sleep(3 * time.Second)
+			maker.PotentialWorking(leonardo, []int{}, []string{"PHY"}, maker.WEAPON_TARGET)
+
+		} else if command == "weaponMAG" {
+			maker.SpecialToRare(leonardo, false)
+			time.Sleep(3 * time.Second)
+			maker.PotentialWorking(leonardo, []int{}, []string{"MAG"}, maker.WEAPON_TARGET)
 
 		} else if command == "1" { // Move cursor to left-top item
 			color.Cyan("[User] command: move cursor to left-top item\n")
@@ -101,7 +114,7 @@ func main() {
 			maker.SpecialToRare(leonardo, true)
 
 		} else if command == "5" { // PotentialWorking with no ignore
-			maker.PotentialWorking(leonardo, []int{})
+			maker.PotentialWorking(leonardo, []int{}, []string{"STR", "INT", "DEX", "LUK", "ALL"}, maker.POTENTIAL_TARGET)
 
 		} else if command == "0" { // Command for experiment
 			maker.Creating(leonardo, 900)

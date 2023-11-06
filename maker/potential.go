@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -23,6 +24,7 @@ const (
 	EN_DISTANCE         = 6
 	RARE_FIRST_DISTANCE = 4
 	POTENTIAL_TARGET    = 9
+	WEAPON_TARGET       = 6
 	FAIL_THRESHOLD      = 3
 	SORT_STACK_X        = 1000
 	SORT_STACK_Y        = 1000
@@ -59,6 +61,8 @@ var (
 	DEX           [8][]int
 	LUK           [8][]int
 	ALL           [8][]int
+	PHY           [8][]int
+	MAG           [8][]int
 	THREE         [8][]int
 	SIX           [8][]int
 )
@@ -115,6 +119,28 @@ func init() {
 		{1, 2, 3, 4, 5, 6, 7, 8, 9, 60, 64, 67, 69, 71},
 		{5, 61, 62, 63, 67, 70},
 	}
+
+	PHY = [8][]int{
+		{0, 2, 5, 6, 7, 8, 9, 10, 86, 87, 91, 94},                 // 1
+		{0, 1, 2, 3, 4, 6, 8, 10, 81, 85, 88, 90, 92, 94},         // 2
+		{0, 2, 6, 8, 10, 81, 84, 90, 92, 93},                      // 3
+		{2, 6, 8, 10, 79, 80, 81, 82, 83, 84, 86, 87, 90, 92, 94}, // 4
+		{2, 3, 5, 8, 10, 81, 84, 85, 88, 91, 92, 93, 95},          // 5
+		{0, 1, 2, 5, 7, 10, 81, 84, 88, 92, 93, 95},               // 6
+		{2, 4, 7, 10, 84, 88, 91, 93, 95},                         // 7
+		{2, 6, 10, 85, 86, 87, 91, 94},                            // 8
+	}
+	MAG = [8][]int{
+		{1, 4, 8, 86, 87, 91, 94},                                            // 1
+		{1, 2, 3, 4, 5, 7, 8, 9, 10, 81, 85, 88, 90, 92, 94},                 // 2
+		{1, 2, 4, 6, 8, 10, 81, 84, 90, 92, 93},                              // 3
+		{1, 3, 4, 5, 6, 7, 8, 9, 79, 80, 81, 82, 83, 84, 86, 87, 90, 92, 94}, // 4
+		{1, 3, 6, 9, 81, 84, 85, 88, 91, 92, 93, 95},                         // 5
+		{1, 3, 4, 5, 6, 7, 8, 9, 81, 84, 88, 92, 93, 95},                     // 6
+		{1, 3, 5, 9, 84, 88, 91, 93, 95},                                     // 7
+		{1, 3, 4, 5, 6, 7, 8, 9, 85, 86, 87, 91, 94},                         // 8
+	}
+
 	THREE = [8][]int{
 		{43, 44, 45, 49, 52},
 		{42, 46, 48, 50, 52},
@@ -138,7 +164,7 @@ func init() {
 }
 
 // Potential main working function
-func PotentialWorking(leonardo *serial.Port, ignore []int) {
+func PotentialWorking(leonardo *serial.Port, ignore []int, attrs []string, target int) {
 	data := make([]byte, 128)
 	for j := 0; j < ItemCountsY; j++ {
 		for i := 0; i < ItemCountsX; i++ {
@@ -168,7 +194,7 @@ func PotentialWorking(leonardo *serial.Port, ignore []int) {
 
 			// Check item potential done
 			fail := 0
-			for !PotentialDetection(&fail) {
+			for !PotentialDetection(&fail, attrs, target) {
 				// fail check
 				if fail >= FAIL_THRESHOLD {
 					i--
@@ -207,7 +233,7 @@ func PotentialWorking(leonardo *serial.Port, ignore []int) {
 }
 
 // Detect potential result meet requirements or not
-func PotentialDetection(fail *int) bool {
+func PotentialDetection(fail *int, attrs []string, target int) bool {
 	bit := robotgo.CaptureScreen(PotentialStartX, PotentialStartY, PotentialWidth, PotentialHeight)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
@@ -221,7 +247,6 @@ func PotentialDetection(fail *int) bool {
 
 	*fail = 0 // reset fail counter to 0 if success
 	potential := make(map[string]int)
-	attrs := []string{"STR", "INT", "DEX", "LUK", "ALL"}
 
 	for i := 0; i < 3; i++ {
 		rootX := RootX
@@ -248,7 +273,7 @@ func PotentialDetection(fail *int) bool {
 	}
 	maxPotential += potential["ALL"]
 
-	if maxPotential >= POTENTIAL_TARGET {
+	if maxPotential >= target {
 		color.Green("[Potential] %s: %+v\n", attr, potential)
 		return true
 	} else {
@@ -410,6 +435,7 @@ func findRootY(rgba *image.RGBA, offset int, rootY *int) bool {
 	return false
 }
 
+// Check if attr is in the potential and return the percentage
 func attributeDetection(rootX, rootY int, rgba *image.RGBA, attr string) (int, error) {
 	// Attribute selection
 	attribute := [8][]int{}
@@ -424,6 +450,10 @@ func attributeDetection(rootX, rootY int, rgba *image.RGBA, attr string) (int, e
 		attribute = LUK
 	case "ALL":
 		attribute = ALL
+	case "PHY":
+		attribute = PHY
+	case "MAG":
+		attribute = MAG
 	default:
 		return 0, fmt.Errorf("[Error] unknown attribute: %s", attr)
 	}
@@ -442,8 +472,10 @@ func attributeDetection(rootX, rootY int, rgba *image.RGBA, attr string) (int, e
 	}
 
 	// Check percentage second
-	if attr == "ALL" {
+	if strings.Compare(attr, "ALL") == 0 {
 		return 3, nil
+	} else if strings.Compare(attr, "PHY") == 0 || strings.Compare(attr, "MAG") == 0 {
+		return 6, nil
 	} else {
 		percent, err := percentDetection(rootX, rootY, rgba, 6)
 		if percent != 0 || err != nil {
