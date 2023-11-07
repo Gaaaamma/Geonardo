@@ -117,7 +117,17 @@ func main() {
 			maker.PotentialWorking(leonardo, []int{}, []string{"STR", "INT", "DEX", "LUK", "ALL"}, maker.POTENTIAL_TARGET)
 
 		} else if command == "0" { // Command for experiment
-			maker.Creating(leonardo, 900)
+			// Test for StarDetection - if we can check the star counts of an item
+			maker.EnchantLocating()
+			maker.CommandInit()
+			for {
+				for i := 0; i < 3; i++ {
+					if maker.StarDetection(i) {
+						color.Green("[Enchant] StarDetection - this is an item with %d stars\n", i)
+					}
+				}
+				time.Sleep(time.Second)
+			}
 		}
 	}
 }
