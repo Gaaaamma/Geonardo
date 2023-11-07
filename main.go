@@ -120,14 +120,7 @@ func main() {
 			// Test for StarDetection - if we can check the star counts of an item
 			maker.EnchantLocating()
 			maker.CommandInit()
-			for {
-				for i := 0; i < 3; i++ {
-					if maker.StarDetection(i) {
-						color.Green("[Enchant] StarDetection - this is an item with %d stars\n", i)
-					}
-				}
-				time.Sleep(time.Second)
-			}
+			maker.EnchantWorking(leonardo, []int{}, 2)
 		}
 	}
 }

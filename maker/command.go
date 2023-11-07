@@ -34,6 +34,14 @@ var (
 	// command_toUpItem    string
 
 	command_keyEnter string
+
+	command_openEnchantUI    string
+	command_toInventory      string
+	command_toEnchantItem    string
+	command_toEnchantReel    string
+	command_toEnchantUse     string
+	command_toEnchantConfirm string
+	command_toEnchantDone    string
 )
 
 // Initialize the command (Must called after updating global settings)
@@ -63,6 +71,14 @@ func CommandInit() {
 	// command_toUpItem = fmt.Sprintf("r%d,%d\n", 0, -1*DownDistance)
 
 	command_keyEnter = "e"
+
+	command_openEnchantUI = fmt.Sprintf("k%s", ENCHANT_SHORTCUT)
+	command_toInventory = fmt.Sprintf("m%d,%d\n", InventoryX, InventoryY)
+	command_toEnchantItem = fmt.Sprintf("m%d,%d\n", EnchantItemX, EnchantItemY)
+	command_toEnchantReel = fmt.Sprintf("m%d,%d\n", EnchantReelX, EnchantReelY)
+	command_toEnchantUse = fmt.Sprintf("m%d,%d\n", EnchantUseX, EnchantUseY)
+	command_toEnchantConfirm = fmt.Sprintf("m%d,%d\n", EnchantConfirmX, EnchantConfirmY)
+	command_toEnchantDone = fmt.Sprintf("m%d,%d\n", EnchantDoneX, EnchantDoneY)
 }
 
 // Move the cursor to item relative to LeftTop item

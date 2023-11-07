@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
+	"github.com/tarm/serial"
 )
 
 const (
@@ -94,6 +96,68 @@ func init() {
 	}
 }
 
+func EnchantWorking(leonardo *serial.Port, ignore []int, starTarget int) {
+	// Open enchant UI
+	data := make([]byte, 128)
+	LeonardoEcho(leonardo, command_openEnchantUI, data)
+	time.Sleep(time.Second)
+
+	for j := 0; j < ItemCountsY; j++ {
+		for i := 0; i < ItemCountsX; i++ {
+			// Ignore item of specific index
+			index := i + j*ItemCountsX
+			if len(ignore) != 0 && index == ignore[0] {
+				// Remove first item in ignore and continue to next round
+				ignore = ignore[1:]
+				continue
+			}
+
+			// Start working
+			// Invoke inventory first
+			LeonardoEcho(leonardo, command_toInventory, data)
+			time.Sleep(100 * time.Millisecond)
+			LeonardoEcho(leonardo, command_singleClick, data)
+			time.Sleep(100 * time.Millisecond)
+
+			// Move to item and put item into enchant UI
+			MoveToItem(leonardo, i, j, 200)
+			time.Sleep(100 * time.Millisecond)
+			LeonardoEcho(leonardo, command_singleClick, data)
+			time.Sleep(100 * time.Millisecond)
+			LeonardoEcho(leonardo, command_toEnchantItem, data)
+			time.Sleep(100 * time.Millisecond)
+			LeonardoEcho(leonardo, command_singleClick, data)
+			time.Sleep(100 * time.Millisecond)
+
+			// Invoke the reel
+			LeonardoEcho(leonardo, command_toEnchantReel, data)
+			time.Sleep(100 * time.Millisecond)
+			LeonardoEcho(leonardo, command_singleClick, data)
+			time.Sleep(100 * time.Millisecond)
+
+			// Start checking star count and do reel and star level up
+			for !StarDetection(starTarget) {
+				// Not yet meet the star requirement
+				LeonardoEcho(leonardo, command_toEnchantUse, data)
+				time.Sleep(100 * time.Millisecond)
+				LeonardoEcho(leonardo, command_doubleClick, data)
+				time.Sleep(100 * time.Millisecond)
+
+				LeonardoEcho(leonardo, command_toEnchantConfirm, data)
+				time.Sleep(100 * time.Millisecond)
+				LeonardoEcho(leonardo, command_doubleClick, data)
+				time.Sleep(1000 * time.Millisecond)
+
+				LeonardoEcho(leonardo, command_toEnchantDone, data)
+				time.Sleep(100 * time.Millisecond)
+				LeonardoEcho(leonardo, command_doubleClick, data)
+				time.Sleep(500 * time.Millisecond)
+			}
+			color.Green("[Enchant] success - star counts %d\n", starTarget)
+		}
+	}
+}
+
 func StarDetection(val int) bool {
 	if val >= len(StarSlice) {
 		log.Fatal("[Enchant] StarDetection - val must not over len(StarSlice)\n")
@@ -165,6 +229,8 @@ func EnchantLocating() {
 		EnchantDoneX = GetLeonardoX(x)
 		EnchantDoneY = GetLeonardoY(y)
 	}
+
+	fmt.Println("[Enchant] Note: don't forget to check the checkbox of star catch")
 
 	for {
 		fmt.Println("[Enchant] Step14: put an item with star enchant")
