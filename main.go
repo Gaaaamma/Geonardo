@@ -27,8 +27,8 @@ func main() {
 
 	// Locating
 	maker.ItemLocating(true)
-	// maker.MysticLocating()
-	// maker.PotentialLocating()
+	maker.MysticLocating()
+	maker.PotentialLocating()
 	maker.EnchantLocating()
 
 	// Command initialization
@@ -82,6 +82,8 @@ func main() {
 			ignore := maker.SpecialToRare(leonardo, true)
 			time.Sleep(3 * time.Second)
 			maker.PotentialWorking(leonardo, ignore, []string{"STR", "INT", "DEX", "LUK", "ALL"}, maker.POTENTIAL_TARGET)
+			time.Sleep(3 * time.Second)
+			maker.EnchantWorking(leonardo, ignore, 2)
 
 		} else if command == "create" {
 			maker.Creating(leonardo, 900)
