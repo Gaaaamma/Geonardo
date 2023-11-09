@@ -225,9 +225,11 @@ func PotentialWorking(leonardo *serial.Port, ignore []int, attrs []string, targe
 			time.Sleep(100 * time.Millisecond)
 			fmt.Printf("[Potential] potential is done\n")
 
-			// Stack concume items to make potential cube recovery
-			StackConsumeItems(leonardo)
-			time.Sleep(100 * time.Millisecond)
+			// Stack concume items to make potential cube recovery except for last item
+			if i != ItemCountsX-1 || j != ItemCountsY-1 {
+				StackConsumeItems(leonardo)
+				time.Sleep(100 * time.Millisecond)
+			}
 		}
 	}
 }
