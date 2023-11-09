@@ -119,7 +119,8 @@ func main() {
 
 		} else if command == "0" { // Command for experiment
 			// Test for StarDetection - if we can check the star counts of an item
-			maker.EnchantWorking(leonardo, []int{}, 2)
+			color.Green("[Enchant] StarDetection: %d\n", maker.StarDetection())
+			// maker.EnchantWorking(leonardo, []int{}, 2)
 		}
 	}
 }

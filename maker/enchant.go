@@ -3,7 +3,6 @@ package maker
 import (
 	"fmt"
 	"image"
-	"log"
 	"time"
 
 	"github.com/fatih/color"
@@ -16,6 +15,8 @@ const (
 	STAR_WORD_HEIGHT    = 12
 	STAR_NUM_DISTANCE_X = -8
 	STAR_NUM_DISTANCE_Y = 2
+	STAR_REEL_STEP      = -1
+	STAR_UNRECOGNIZABLE = -2
 )
 
 var (
@@ -41,6 +42,8 @@ var (
 	StarCatchX      int
 	StarCatchY      int
 
+	StarWordX int
+	StarWordY int
 	StarRootX int
 	StarRootY int
 	Star      [8][]int
@@ -143,9 +146,9 @@ func EnchantWorking(leonardo *serial.Port, ignore []int, starTarget int) {
 			time.Sleep(500 * time.Millisecond)
 
 			// Start checking star count and do reel and star level up
-			for !StarDetection(starTarget) {
-				// If we are at star 0 and starCatch is true
-				if starCatch && StarDetection(0) {
+			for starCounts := StarDetection(); starCounts != STAR_UNRECOGNIZABLE && starCounts != starTarget; {
+				// Check if starCatch is on and we are not at reel step
+				if starCatch && starCounts != STAR_REEL_STEP {
 					// Must cancel star catch mechanism
 					LeonardoEcho(leonardo, command_toStarCatch, data)
 					time.Sleep(time.Second)
@@ -174,26 +177,40 @@ func EnchantWorking(leonardo *serial.Port, ignore []int, starTarget int) {
 	}
 }
 
-func StarDetection(val int) bool {
-	if val >= len(StarSlice) {
-		log.Fatal("[Enchant] StarDetection - val must not over len(StarSlice)\n")
-	}
+/*
+Return value >= 0 when star count is recognizable.
+Return STAR_REEL_STEP when it is reel step.
+Return STAR_UNRECOGNIZABLE when star count is unrecognizable.
+*/
+func StarDetection() int {
 	bit := robotgo.CaptureScreen(EnchantStartX, EnchantStartY, EnchantWidth, EnchantHeight)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 
-	for j, row := range StarSlice[val] {
-		for _, index := range row {
-			r, g, b, _ := rgba.At(StarRootX+index, StarRootY+j).RGBA()
-			r8 := (uint8)(r >> 8)
-			g8 := (uint8)(g >> 8)
-			b8 := (uint8)(b >> 8)
-			if !isWhite(r8, g8, b8) {
-				return false
+	// Check if it is in reel step by star word finding
+	if !starFind(rgba, StarWordX, StarWordY) {
+		// No any star word found: still in Reel step
+		return STAR_REEL_STEP
+	}
+
+	// Star step
+NEXT_STAR:
+	for starCounts, star := range StarSlice {
+		for j, row := range star {
+			for _, index := range row {
+				r, g, b, _ := rgba.At(StarRootX+index, StarRootY+j).RGBA()
+				r8 := (uint8)(r >> 8)
+				g8 := (uint8)(g >> 8)
+				b8 := (uint8)(b >> 8)
+				if !isWhite(r8, g8, b8) {
+					continue NEXT_STAR
+				}
 			}
 		}
+		return starCounts
 	}
-	return true
+	// Star count is unrecognizable
+	return STAR_UNRECOGNIZABLE
 }
 
 func EnchantLocating() {
@@ -295,6 +312,8 @@ func findStarRoot(startX, startY, width, height int) error {
 			g8 := (uint8)(g >> 8)
 			b8 := (uint8)(b >> 8)
 			if x+STAR_NUM_DISTANCE_X >= 0 && y+STAR_WORD_HEIGHT < rgba.Bounds().Dy() && isWhite(r8, g8, b8) && starFind(rgba, x, y) { // Find "white" point and starFind success
+				StarWordX = x
+				StarWordY = y
 				StarRootX = x + STAR_NUM_DISTANCE_X
 				StarRootY = y + STAR_NUM_DISTANCE_Y
 				return nil
