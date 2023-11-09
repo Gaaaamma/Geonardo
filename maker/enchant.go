@@ -38,6 +38,8 @@ var (
 	EnchantConfirmY int
 	EnchantDoneX    int
 	EnchantDoneY    int
+	StarCatchX      int
+	StarCatchY      int
 
 	StarRootX int
 	StarRootY int
@@ -97,8 +99,13 @@ func init() {
 }
 
 func EnchantWorking(leonardo *serial.Port, ignore []int, starTarget int) {
-	// Open enchant UI
+	// Open enchant UI and cancel star catch
+	starCatch := true
 	data := make([]byte, 128)
+	LeonardoEcho(leonardo, command_toInventory, data)
+	time.Sleep(200 * time.Millisecond)
+	LeonardoEcho(leonardo, command_singleClick, data)
+	time.Sleep(time.Second)
 	LeonardoEcho(leonardo, command_openEnchantUI, data)
 	time.Sleep(time.Second)
 
@@ -115,41 +122,50 @@ func EnchantWorking(leonardo *serial.Port, ignore []int, starTarget int) {
 			// Start working
 			// Invoke inventory first
 			LeonardoEcho(leonardo, command_toInventory, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(200 * time.Millisecond)
 			LeonardoEcho(leonardo, command_singleClick, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(200 * time.Millisecond)
 
 			// Move to item and put item into enchant UI
 			MoveToItem(leonardo, i, j, 200)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			LeonardoEcho(leonardo, command_singleClick, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			LeonardoEcho(leonardo, command_toEnchantItem, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			LeonardoEcho(leonardo, command_singleClick, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 
 			// Invoke the reel
 			LeonardoEcho(leonardo, command_toEnchantReel, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			LeonardoEcho(leonardo, command_singleClick, data)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 
 			// Start checking star count and do reel and star level up
 			for !StarDetection(starTarget) {
+				// If we are at star 0 and starCatch is true
+				if starCatch && StarDetection(0) {
+					// Must cancel star catch mechanism
+					LeonardoEcho(leonardo, command_toStarCatch, data)
+					time.Sleep(time.Second)
+					LeonardoEcho(leonardo, command_singleClick, data)
+					time.Sleep(time.Second)
+					starCatch = false
+				}
 				// Not yet meet the star requirement
 				LeonardoEcho(leonardo, command_toEnchantUse, data)
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				LeonardoEcho(leonardo, command_doubleClick, data)
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 
 				LeonardoEcho(leonardo, command_toEnchantConfirm, data)
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				LeonardoEcho(leonardo, command_doubleClick, data)
-				time.Sleep(1000 * time.Millisecond)
+				time.Sleep(1500 * time.Millisecond)
 
 				LeonardoEcho(leonardo, command_toEnchantDone, data)
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				LeonardoEcho(leonardo, command_doubleClick, data)
 				time.Sleep(500 * time.Millisecond)
 			}
@@ -230,20 +246,26 @@ func EnchantLocating() {
 		EnchantDoneY = GetLeonardoY(y)
 	}
 
-	fmt.Println("[Enchant] Note: don't forget to check the checkbox of star catch")
+	fmt.Println("[Enchant] Step14: move cursor to star catch checkbox")
+	fmt.Println("[Enchant] Step15: press 'y' to catch position")
+	if robotgo.AddEvent("y") {
+		x, y := robotgo.GetMousePos()
+		StarCatchX = GetLeonardoX(x)
+		StarCatchY = GetLeonardoY(y)
+	}
 
 	for {
-		fmt.Println("[Enchant] Step14: put an item with star enchant")
-		fmt.Println("[Enchant] Step15: move cursor to left-top of the star enchant")
-		fmt.Println("[Enchant] Step16: press 'y' to catch position")
+		fmt.Println("[Enchant] Step16: put an item with star enchant")
+		fmt.Println("[Enchant] Step17: move cursor to left-top of the star enchant")
+		fmt.Println("[Enchant] Step18: press 'y' to catch position")
 		if robotgo.AddEvent("y") {
 			x, y := robotgo.GetMousePos()
 			EnchantStartX = GetWindowsX(x)
 			EnchantStartY = GetWindowsY(y)
 		}
 
-		fmt.Println("[Enchant] Step15: move cursor to right-bottom of the star enchant")
-		fmt.Println("[Enchant] Step16: press 'y' to catch position")
+		fmt.Println("[Enchant] Step19: move cursor to right-bottom of the star enchant")
+		fmt.Println("[Enchant] Step20: press 'y' to catch position")
 		if robotgo.AddEvent("y") {
 			x, y := robotgo.GetMousePos()
 			x = GetWindowsX(x)

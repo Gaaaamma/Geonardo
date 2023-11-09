@@ -42,6 +42,7 @@ var (
 	command_toEnchantUse     string
 	command_toEnchantConfirm string
 	command_toEnchantDone    string
+	command_toStarCatch      string
 )
 
 // Initialize the command (Must called after updating global settings)
@@ -79,6 +80,7 @@ func CommandInit() {
 	command_toEnchantUse = fmt.Sprintf("m%d,%d\n", EnchantUseX, EnchantUseY)
 	command_toEnchantConfirm = fmt.Sprintf("m%d,%d\n", EnchantConfirmX, EnchantConfirmY)
 	command_toEnchantDone = fmt.Sprintf("m%d,%d\n", EnchantDoneX, EnchantDoneY)
+	command_toStarCatch = fmt.Sprintf("m%d,%d\n", StarCatchX, StarCatchY)
 }
 
 // Move the cursor to item relative to LeftTop item

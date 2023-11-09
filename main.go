@@ -27,8 +27,9 @@ func main() {
 
 	// Locating
 	maker.ItemLocating(true)
-	maker.MysticLocating()
-	maker.PotentialLocating()
+	// maker.MysticLocating()
+	// maker.PotentialLocating()
+	maker.EnchantLocating()
 
 	// Command initialization
 	maker.CommandInit()
@@ -118,8 +119,6 @@ func main() {
 
 		} else if command == "0" { // Command for experiment
 			// Test for StarDetection - if we can check the star counts of an item
-			maker.EnchantLocating()
-			maker.CommandInit()
 			maker.EnchantWorking(leonardo, []int{}, 2)
 		}
 	}
