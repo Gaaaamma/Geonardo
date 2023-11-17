@@ -53,9 +53,42 @@ void loop() {
     } else if (c == '3') {
     } else if (c == '0') {
       bool direction = false;
-      int times = 5;
-      Turn(direction);
-      UpJump(400, 450);
+      unsigned long start = millis();
+      unsigned long TornadoStart = start;
+      unsigned long SwirlStart = start;
+      unsigned long FantasyStart = start;
+
+      for (int i = 0; i < 500; i++) {
+        SongOfTheSky(direction, 80, 120, 1000);
+        direction = !direction;
+        
+        unsigned long time = millis();
+        int second = (time-start)/1000;
+        if ((time-FantasyStart)/1000 > FANTASY_CD) {
+          SimpleSkill(direction, FANTASY);
+          FantasyStart = millis();
+          delay(600);
+          Serial.print(second);
+          Serial.println("Fantasy");
+        }
+        if ((time-TornadoStart)/1000 > TORNADO_CD) {
+          Tornado(direction);
+          TornadoStart = millis();
+          delay(random(700, 1000));
+
+          Serial.print(second);
+          Serial.println("Tornado");
+        }
+        if ((time-SwirlStart)/1000 > SWIRL_CD) {
+          Swirl(direction);
+          SwirlStart = millis();
+          delay(random(800, 1000));
+
+          Serial.print(second);
+          Serial.println("Swirl");
+        }
+        delay(random(50, 100));
+      }
     }
   }
 }
