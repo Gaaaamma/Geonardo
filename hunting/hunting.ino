@@ -6,6 +6,7 @@ KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
 
+const unsigned long WHEEL_CD = 900;
 const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
@@ -42,7 +43,11 @@ void loop() {
     char c = (char)Serial.read();
     if (c == '1') {
     } else if (c == '2') {
-      DoubleJumpAttackA(false, 'f', 'd');
+      char test[] = {'w', 'a', 'd', 'a', 'd', 'q', 'k', 'j', 'e', 'l', 'r'};
+      unsigned long minDelay[] = {1000, 550, 550, 550, 2000, 2000, 2000, 2000, 2000, 1000, 1000};
+      unsigned long maxDelay[] = {1001, 551, 551, 551, 2001, 2001, 2001, 2001, 2001, 1001, 1001};
+      int command = 11;
+      Move(test, command, minDelay, maxDelay);
 
     } else if (c == '3') {
       MoveFountainA();
@@ -60,22 +65,26 @@ void loop() {
       unsigned long BirdStart = start;
       unsigned long buffStart[5] = {start, start, start, start, start};
 
-      for (int i = 0; i < 500; i++) {
+      unsigned long time = millis();
+      int second = (time-start)/1000;
+      bool startUp = true;
+      while (second < WHEEL_CD) {
         SongOfTheSky(direction, 80, 120, 100, 1000);
         direction = !direction;
         
-        unsigned long time = millis();
-        int second = (time-start)/1000;
         // Fantasy
-        if ((time-FantasyStart)/1000 > FANTASY_CD) {
+        if (startUp || (time-FantasyStart)/1000 > FANTASY_CD) {
           SimpleSkill(direction, FANTASY);
           FantasyStart = millis();
           delay(600);
           Serial.print(second);
           Serial.println("Fantasy");
         }
+        
         // Tornado
-        if ((time-TornadoStart)/1000 > TORNADO_CD) {
+        time = millis();
+        second = (time-start)/1000;
+        if (startUp || (time-TornadoStart)/1000 > TORNADO_CD) {
           Tornado(direction);
           TornadoStart = millis();
           delay(random(700, 1000));
@@ -84,10 +93,10 @@ void loop() {
           Serial.println("Tornado");
         }
 
+        // Swirl
         time = millis();
         second = (time-start)/1000;
-        // Swirl
-        if ((time-SwirlStart)/1000 > SWIRL_CD) {
+        if (startUp || (time-SwirlStart)/1000 > SWIRL_CD) {
           Swirl(direction);
           SwirlStart = millis();
           delay(random(800, 1000));
@@ -95,8 +104,11 @@ void loop() {
           Serial.print(second);
           Serial.println("Swirl");
         }
+
         // Bird
-        if ((time-BirdStart)/1000 > BIRD_CD) {
+        time = millis();
+        second = (time-start)/1000;
+        if (startUp || (time-BirdStart)/1000 > BIRD_CD) {
           SimpleSkill(direction, BIRD);
           BirdStart = millis();
           delay(random(800, 1000));
@@ -107,8 +119,9 @@ void loop() {
 
         // Buffs
         for (int i = 0; i < BUFF_COUNTS; i++) {
-          second = (millis()-start)/1000;
-          if ((time-buffStart[i])/1000 > BUFF_CD[i]) {
+          time = millis();
+          second = (time-start)/1000;
+          if (startUp || (time-buffStart[i])/1000 > BUFF_CD[i]) {
             SimpleSkill(direction, BUFF[i]);
             buffStart[i] = millis();
             delay(random(800, 1000));
@@ -118,11 +131,12 @@ void loop() {
           }
         }
 
+        // Fountain
         time = millis();
         second = (time-start)/1000;
-        // Fountain
-        if ((time-FountainStart)/1000 > FOUNTAIN_CD) {
+        if (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD) {
           // Move to the specific position
+          MoveFountainA();
 
           // Fountain
           Fountain((bool)random(2));
@@ -133,8 +147,10 @@ void loop() {
           Serial.println("Fountain");
           
           // Move back to origin position
+          BackFountainA();
         }
         delay(random(50, 100));
+        startUp = false;
       }
     }
   }
@@ -174,11 +190,11 @@ void Turn(bool direction) {
   delay(100);
 }
 
-// min max will affect the height of UpJump
-void UpJump(unsigned long min, unsigned long max) {
+// minUp maxUp will affect the height of UpJump
+void UpJump(unsigned long minUp, unsigned long maxUp) {
   Keyboard.write(JUMP);  
   Keyboard.press(KEY_UP_ARROW);
-  delay(random(min, max));
+  delay(random(minUp, maxUp));
 
   Keyboard.write(JUMP);
   Keyboard.write(JUMP);
@@ -193,65 +209,65 @@ void DownJump() {
   Keyboard.releaseAll();
 }
 
-// min: 90, max: 120 (Round_min: 700, Round_max: 900)
-void DoubleJumpLatency(bool direction, unsigned long min, unsigned long max) {
+// minDJ: 90, maxDJ: 120 (Round_min: 700, Round_max: 900)
+void DoubleJumpLatency(bool direction, unsigned long minDJ, unsigned long maxDJ) {
   if (direction == true) {
     Keyboard.press(KEY_RIGHT_ARROW);
   } else {
     Keyboard.press(KEY_LEFT_ARROW);
   }
   Keyboard.write(JUMP);
-  delay(random(min, max));
+  delay(random(minDJ, maxDJ));
   Keyboard.write(JUMP);
   Keyboard.write(JUMP);
   Keyboard.releaseAll();
 }
 
-// min: 80, max: 120 (Round_min + Margin: 800, Margin: 0 ~ 300)
-void DoubleJumpAttackLatency(bool direction, unsigned long min, unsigned long max, unsigned long margin) {
+// minDJ: 80, maxDJ: 120 (Round_min + minAttack: >800, Attack: 0 ~ 300)
+void DoubleJumpAttackLatency(bool direction, unsigned long minDJ, unsigned long maxDJ, unsigned long minAttack, unsigned long maxAttack) {
   if (direction == true) {
     Keyboard.press(KEY_RIGHT_ARROW);
   } else {
     Keyboard.press(KEY_LEFT_ARROW);
   }
   Keyboard.write(JUMP);
-  delay(random(min, max));
+  delay(random(minDJ, maxDJ));
   Keyboard.write(JUMP);
   Keyboard.write(JUMP);
-  delay(margin);
+  delay(random(minAttack, maxAttack));
   Keyboard.write(ELF_SHIELD);
   Keyboard.releaseAll();
 }
 
-// min: 80, max: 120 (Round_min: 550, Round_max: 800)
-void WindMove(bool direction, unsigned long min, unsigned long max) {
+// minWalk: 80, maxWalk: 120 (Round_min: 550, Round_max: 800)
+void WindMove(bool direction, unsigned long minWalk, unsigned long maxWalk) {
   if (direction == true) {
     Keyboard.press(KEY_RIGHT_ARROW);
   } else {
     Keyboard.press(KEY_LEFT_ARROW);
   }
-  delay(random(min, max));
+  delay(random(minWalk, maxWalk));
   Keyboard.write(WIND_MOVE);
   Keyboard.releaseAll();
 }
 
-// min: 80, max: 120 (Round_min: 900, Margin: 100 ~ 500)
+// minDJ: 80, maxDJ: 120 (Round_min: 900, Margin: 100 ~ 500)
 // margin: 100 moves the shortest
 // margin: 500 moves the longest
-void DoubleJumpWindMove(bool direction, unsigned long min, unsigned long max) {
-  DoubleJumpLatency(direction, min, max);
-  delay(random(100, 500)); 
-  WindMove(direction, min, max);
+void DoubleJumpWindMove(bool direction, unsigned long minDJ, unsigned long maxDJ, unsigned long minMargin, unsigned long maxMargin, unsigned long minWalk, unsigned long maxWalk) {
+  DoubleJumpLatency(direction, minDJ, maxDJ);
+  delay(random(minMargin, maxMargin)); 
+  WindMove(direction, minWalk, maxWalk);
 }
 
-// min: 80, max: 120 (Round_min: 50, Duration: 100 ~ 1000)
-unsigned long SongOfTheSky(bool direction, unsigned long min, unsigned long max, unsigned long minDuration, unsigned long maxDuration) {
+// minWalk: 80, maxWalk: 120 (Round_min: 50, Duration: >100)
+unsigned long SongOfTheSky(bool direction, unsigned long minWalk, unsigned long maxWalk, unsigned long minDuration, unsigned long maxDuration) {
   if (direction == true) {
     Keyboard.press(KEY_RIGHT_ARROW);
   } else {
     Keyboard.press(KEY_LEFT_ARROW);
   }
-  unsigned long distance = random(min, max);
+  unsigned long distance = random(minWalk, maxWalk);
   delay(distance);
   Keyboard.press(SONG_SKY);
   delay(random(minDuration, maxDuration));
@@ -325,6 +341,10 @@ void Move(char direction[], int counts, unsigned long minDelay[], unsigned long 
       Turn(false);
     } else if (direction[i] == 'r') {
       Turn(true);
+    } else if (direction[i] == 'j') {
+      DoubleJumpAttackLatency(false, 80, 100, 100, 200);
+    } else if (direction[i] == 'k') {
+      DoubleJumpAttackLatency(true, 80, 100, 100, 200);
     }
     delay(random(minDelay[i], maxDelay[i]));
   }
