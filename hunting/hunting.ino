@@ -24,6 +24,8 @@ const unsigned long FANTASY_CD = 10;
 const char BIRD = 'v';
 const unsigned long BIRD_CD = 30;
 
+const unsigned long MONEY_CD = 90; 
+
 const int BUFF_COUNTS = 5;
 const char BUFF[5] = {'3', '4', 'g', 'c', 'x'};
 const String BUFF_NAME[5] = {"Storm", "Glory", "Shilff", "Grandpa", "Critical"};
@@ -42,18 +44,21 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == '1') {
+      for (int i = 0; i < 10; i++) {
+        MoveToFountain_2_6();
+        BackFromFountain_2_6();
+      }
+      delay(random(500, 800));
+
     } else if (c == '2') {
+      CollectMoney_2_6();
+
+    } else if (c == '3') {
       char test[] = {'w', 'a', 'd', 'a', 'd', 'q', 'k', 'j', 'e', 'l', 'r'};
       unsigned long minDelay[] = {1000, 550, 550, 550, 2000, 2000, 2000, 2000, 2000, 1000, 1000};
       unsigned long maxDelay[] = {1001, 551, 551, 551, 2001, 2001, 2001, 2001, 2001, 1001, 1001};
       int command = 11;
       Move(test, command, minDelay, maxDelay);
-
-    } else if (c == '3') {
-      MoveFountainA();
-      BackFountainA();
-      MoveFountainA();
-      BackFountainA();
 
     } else if (c == '0') {
       bool direction = false;
@@ -63,13 +68,15 @@ void loop() {
       unsigned long FantasyStart = start;
       unsigned long FountainStart = start;
       unsigned long BirdStart = start;
+      unsigned long MoneyStart = start;
+
       unsigned long buffStart[5] = {start, start, start, start, start};
 
       unsigned long time = millis();
       int second = (time-start)/1000;
       bool startUp = true;
       while (second < WHEEL_CD) {
-        SongOfTheSky(direction, 80, 120, 100, 1000);
+        SongOfTheSky(direction, 30, 60, 100, 1000);
         direction = !direction;
         
         // Fantasy
@@ -136,7 +143,7 @@ void loop() {
         second = (time-start)/1000;
         if (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD) {
           // Move to the specific position
-          MoveFountainA();
+          MoveToFountain_2_6();
 
           // Fountain
           Fountain((bool)random(2));
@@ -147,7 +154,16 @@ void loop() {
           Serial.println("Fountain");
           
           // Move back to origin position
-          BackFountainA();
+          BackFromFountain_2_6();
+        }
+
+        // Money
+        time = millis();
+        second = (time-start)/1000;
+        if (startUp || (time-MoneyStart)/1000 > MONEY_CD) {
+          // Collect money
+          CollectMoney_2_6();
+          MoneyStart = millis();
         }
         delay(random(50, 100));
         startUp = false;
@@ -286,7 +302,7 @@ void Fountain(bool direction) {
 
   Keyboard.press(KEY_DOWN_ARROW);
   Keyboard.write(FOUNTAIN);
-  delay(random(50, 100));
+  delay(random(70, 100));
   Keyboard.releaseAll();
 }
 
@@ -350,15 +366,85 @@ void Move(char direction[], int counts, unsigned long minDelay[], unsigned long 
   }
 }
 
-void MoveFountainA() {
+/************** 2-6 ***************/
+void MoveToFountain_2_6() {
+  unsigned long rand = random(4);
+  if (rand == 0) {
+    MoveToFountainA_2_6();
+  } else if (rand == 1) {
+    MoveToFountainB_2_6();
+  } else if (rand == 2) {
+    MoveToFountainC_2_6();
+  } else if (rand == 3) {
+    MoveToFountainD_2_6();
+  }
+}
+
+void BackFromFountain_2_6() {
+  unsigned long rand = random(2);
+  if (rand == 0) {
+    BackFromFountainA_2_6();
+  } else if (rand == 1) {
+    BackFromFountainB_2_6();
+  } 
+}
+
+void MoveToFountainA_2_6() {
   char commands[] = {'a', 'a', 'w', 'r'};
-  unsigned long minDelay[] = {550, 550, 900, 50};
-  unsigned long maxDelay[] = {650, 650, 1000, 80};
+  unsigned long minDelay[] = {550, 650, 900, 50};
+  unsigned long maxDelay[] = {650, 750, 1000, 80};
   Move(commands, 4, minDelay, maxDelay);
 }
-void BackFountainA() {
-  char commands[] = {'e'};
-  unsigned long minDelay[] = {1500};
-  unsigned long maxDelay[] = {2000};
-  Move(commands, 1, minDelay, maxDelay);
+
+void MoveToFountainB_2_6() {
+  char commands[] = {'w', 'a', 'a', 'r'};
+  unsigned long minDelay[] = {700, 550, 550, 250};
+  unsigned long maxDelay[] = {750, 600, 600, 280};
+  Move(commands, 4, minDelay, maxDelay);
 }
+
+void MoveToFountainC_2_6() {
+  char commands[] = {'a', 'w', 'a', 'r'};
+  unsigned long minDelay[] = {550, 700, 550, 250};
+  unsigned long maxDelay[] = {600, 750, 600, 280};
+  Move(commands, 4, minDelay, maxDelay);
+}
+
+void MoveToFountainD_2_6() {
+  char commands[] = {'q', 'w', 'r'};
+  unsigned long minDelay[] = {700, 400, 1000};
+  unsigned long maxDelay[] = {750, 500, 1200};
+  Move(commands, 3, minDelay, maxDelay);
+}
+
+void BackFromFountainA_2_6() {
+  char commands[] = {'e', 'd'};
+  unsigned long minDelay[] = {350, 1000};
+  unsigned long maxDelay[] = {450, 1200};
+  Move(commands, 2, minDelay, maxDelay);
+}
+
+void BackFromFountainB_2_6() {
+  char commands[] = {'s', 'd', 'd'};
+  unsigned long minDelay[] = {1100, 550, 700};
+  unsigned long maxDelay[] = {1200, 600, 800};
+  Move(commands, 3, minDelay, maxDelay);
+}
+
+void CollectMoney_2_6() {
+  unsigned long rand = random(1);
+  if (rand == 0) {
+    CollectMoneyA_2_6();
+  } else if (rand == 1) {
+
+  }
+}
+
+void CollectMoneyA_2_6() {
+  char commands[] = {'d', 'd', 'w', 'l', 'q', 'a'};
+  unsigned long minDelay[] = {550, 550, 900, 200, 350, 1000};
+  unsigned long maxDelay[] = {650, 650, 1000, 250, 450, 1200};
+  Move(commands, 6, minDelay, maxDelay);
+}
+
+/**********************************/
