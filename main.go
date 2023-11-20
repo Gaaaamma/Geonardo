@@ -2,6 +2,7 @@ package main
 
 import (
 	"Geonardo/maker"
+	"Geonardo/remote"
 	"flag"
 	"fmt"
 	"log"
@@ -11,9 +12,17 @@ import (
 	"github.com/tarm/serial"
 )
 
+const REMOTE_MODE = true
 const COMMAND_MAXLENGH = 16
 
 func main() {
+	// Remote mode
+	if REMOTE_MODE {
+		remote.FrenzyLocating()
+		remote.FrenzyWorking()
+		return
+	}
+
 	// Parsing argument to change port and baud rate
 	device := flag.String("p", "COM10", "Serial port name of the device")
 	baud := flag.Int("b", 9600, "Baud rate of the device")
