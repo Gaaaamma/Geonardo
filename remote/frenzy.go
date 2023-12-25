@@ -12,7 +12,7 @@ const (
 	FRENZY_KEY = "q"
 	BURN_KEY   = "e"
 	FRENZY_CD  = 420
-	BURN_CD    = 1800
+	BURN_CD    = 1830
 	CENTER_X   = 720
 	CENTER_Y   = 466
 )
@@ -43,7 +43,7 @@ func FrenzyWorking() {
 
 	time.Sleep(time.Second)
 	robotgo.KeyTap(BURN_KEY)
-	color.Green("[Frenzy] play the skill burn: %v", time.Now())
+	color.Green("[Burn] play the skill burn: %v", time.Now())
 
 	for {
 		select {
@@ -59,7 +59,7 @@ func FrenzyWorking() {
 			goToGame()
 			time.Sleep(time.Second)
 			robotgo.KeyTap(BURN_KEY)
-			color.Green("[Frenzy] play the skill burn: %v", t)
+			color.Green("[Burn] play the skill burn: %v", t)
 		}
 	}
 }
