@@ -1,12 +1,12 @@
 /*
-KEY_UP_ARROW
+KEY_UP_ARROWc
 KEY_DOWN_ARROW
 KEY_LEFT_ARROW
 KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
 
-const unsigned long WHEEL_CD = 900;
+const unsigned long WHEEL_CD = 930;
 const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
