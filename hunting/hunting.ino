@@ -51,7 +51,7 @@ void loop() {
       delay(random(500, 800));
 
     } else if (c == '2') {
-      CollectMoney_2_6();
+      CollectMoney_library4();
 
     } else if (c == '3') {
       char test[] = {'w', 'a', 'd', 'a', 'd', 'q', 'k', 'j', 'e', 'l', 'r'};
@@ -76,7 +76,7 @@ void loop() {
       int second = (time-start)/1000;
       bool startUp = true;
       while (second < WHEEL_CD) {
-        SongOfTheSky(direction, 30, 60, 100, 1000);
+        SongOfTheSky(direction, 10, 20, 500, 1000);
         direction = !direction;
         
         // Fantasy
@@ -143,10 +143,11 @@ void loop() {
         second = (time-start)/1000;
         if (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD) {
           // Move to the specific position
-          MoveToFountain_2_6();
+          // MoveToFountain_2_6();
+          MoveToFountain_library4();
 
           // Fountain
-          Fountain((bool)random(2));
+          Fountain(false);
           FountainStart = millis();
           delay(random(800, 1000));
 
@@ -154,7 +155,8 @@ void loop() {
           Serial.println("Fountain");
           
           // Move back to origin position
-          BackFromFountain_2_6();
+          // BackFromFountain_2_6();
+          BackFromFountain_library4();
         }
 
         // Money
@@ -162,7 +164,8 @@ void loop() {
         second = (time-start)/1000;
         if (startUp || (time-MoneyStart)/1000 > MONEY_CD) {
           // Collect money
-          CollectMoney_2_6();
+          // CollectMoney_2_6();
+          CollectMoney_library4();
           MoneyStart = millis();
         }
         delay(random(50, 100));
@@ -364,6 +367,42 @@ void Move(char direction[], int counts, unsigned long minDelay[], unsigned long 
     }
     delay(random(minDelay[i], maxDelay[i]));
   }
+}
+/************** Library 4 ***************/
+void MoveToFountain_library4() {
+  unsigned long rand = random(1);
+  if (rand == 0) {
+    MoveToFountainA_library4();
+  } else if (rand == 1) {
+
+  } else if (rand == 2) {
+
+  } else if (rand == 3) {
+
+  }
+}
+
+void MoveToFountainA_library4() {
+  char commands[] = {'e', 'd'};
+  unsigned long minDelay[] = {400, 750};
+  unsigned long maxDelay[] = {450, 850};
+  Move(commands, 2, minDelay, maxDelay);
+}
+
+void BackFromFountain_library4() {
+  char commands[] = {'q', 'a'};
+  unsigned long minDelay[] = {400, 900};
+  unsigned long maxDelay[] = {450, 1000};
+  Move(commands, 2, minDelay, maxDelay);
+}
+
+void CollectMoney_library4() {
+  MoveToFountainA_library4();
+  delay(800);
+  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'e', 'd'};
+  unsigned long minDelay[] = {900, 500, 500, 500, 500, 550, 700, 1000, 400, 650};
+  unsigned long maxDelay[] = {1000, 550, 550, 550, 550, 600, 800, 1100, 450, 750};
+  Move(commands, 10, minDelay, maxDelay);
 }
 
 /************** 2-6 ***************/
