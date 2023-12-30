@@ -400,8 +400,8 @@ void CollectMoney_library4() {
   MoveToFountainA_library4();
   delay(800);
   char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'e', 'd'};
-  unsigned long minDelay[] = {900, 500, 500, 500, 500, 550, 700, 1000, 400, 650};
-  unsigned long maxDelay[] = {1000, 550, 550, 550, 550, 600, 800, 1100, 450, 750};
+  unsigned long minDelay[] = {900, 500, 500, 500, 500, 550, 700, 1000, 400, 900};
+  unsigned long maxDelay[] = {1000, 550, 550, 550, 550, 600, 800, 1100, 450, 1000};
   Move(commands, 10, minDelay, maxDelay);
 }
 
