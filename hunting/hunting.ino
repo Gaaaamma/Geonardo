@@ -16,7 +16,9 @@ const char ROPE = 't';
 const char FOUNTAIN = 'z';
 const unsigned long FOUNTAIN_CD = 58; 
 const char TORNADO = 'b';
-const unsigned long TORNADO_CD = 20; 
+const unsigned long TORNADO_CD = 20;
+const char MONSOON = 'q';
+const unsigned long MONSOON_CD = 28;
 const char SWIRL = 'e';
 const unsigned long SWIRL_CD = 30;
 const char FANTASY = ' ';
@@ -65,6 +67,7 @@ void loop() {
       unsigned long start = millis();
       unsigned long TornadoStart = start;
       unsigned long SwirlStart = start;
+      unsigned long MonsoonStart = start;
       unsigned long FantasyStart = start;
       unsigned long FountainStart = start;
       unsigned long BirdStart = start;
@@ -122,6 +125,18 @@ void loop() {
 
           Serial.print(second);
           Serial.println("Bird");
+        }
+
+        // Monsoon
+        time = millis();
+        second = (time-start)/1000;
+        if (startUp || (time-MonsoonStart)/1000 > MONSOON_CD) {
+          SimpleSkill(direction, MONSOON);
+          MonsoonStart = millis();
+          delay(random(1000, 1200));
+
+          Serial.print(second);
+          Serial.println("Monsoon");
         }
 
         // Buffs
