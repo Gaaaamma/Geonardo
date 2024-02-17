@@ -5,6 +5,13 @@ KEY_LEFT_ARROW
 KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
+const char GUIDE = 'u';
+const int GUIDE_DAILY_TASKS = 6;
+const long GUIDE_FIRST_X = -30000;
+const long GUIDE_FIRST_Y = -2000;
+const long GUIDE_DISTANCE_X = 1650;
+const long MOVE_BOUnD_MAX = 32767;
+const long MOVE_BOUND_MIN = -32767;
 
 const unsigned long WHEEL_CD = 630;
 const char JUMP = 'f';
@@ -45,12 +52,15 @@ void loop() {
     // Start with a command character
     delay(3000);
     char c = (char)Serial.read();
-    if (c == '1') {
-      for (int i = 0; i < 10; i++) {
-        MoveToFountain_2_6();
-        BackFromFountain_2_6();
+    if (c == '1') { // daily task
+      const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70};
+
+      for (int i = 0; i < GUIDE_DAILY_TASKS; i++) {
+        GuideMoving(i+1);
+        delay(500);
+        Battle(BATTLE_TIME[i], i+1, false);
+        delay(3000);
       }
-      delay(random(500, 800));
 
     } else if (c == '2') {
       CollectMoney_library4();
@@ -63,136 +73,198 @@ void loop() {
       Move(test, command, minDelay, maxDelay);
 
     } else if (c == '0') {
-      bool direction = false;
-      unsigned long start = millis();
-      unsigned long TornadoStart = start;
-      unsigned long SwirlStart = start;
-      unsigned long MonsoonStart = start;
-      unsigned long FantasyStart = start;
-      unsigned long FountainStart = start;
-      unsigned long BirdStart = start;
-      unsigned long MoneyStart = start;
-
-      unsigned long buffStart[5] = {start, start, start, start, start};
-
-      unsigned long time = millis();
-      int second = (time-start)/1000;
-      bool startUp = true;
-      while (second < WHEEL_CD) {
-        bool underAttack = false;
-        SongOfTheSky(direction, 10, 20, 500, 1000);
-        direction = !direction;
-        
-        // Fantasy
-        if (startUp || (time-FantasyStart)/1000 > FANTASY_CD) {
-          SimpleSkill(direction, FANTASY);
-          FantasyStart = millis();
-          delay(600);
-          Serial.print(second);
-          Serial.println("Fantasy");
-        }
-        
-        // Tornado
-        time = millis();
-        second = (time-start)/1000;
-        if (startUp || (time-TornadoStart)/1000 > TORNADO_CD) {
-          Tornado(direction);
-          TornadoStart = millis();
-          delay(random(700, 1000));
-
-          Serial.print(second);
-          Serial.println("Tornado");
-          underAttack = true;
-        }
-
-        // Swirl
-        time = millis();
-        second = (time-start)/1000;
-        if (startUp || (time-SwirlStart)/1000 > SWIRL_CD) {
-          Swirl(direction);
-          SwirlStart = millis();
-          delay(random(800, 1000));
-
-          Serial.print(second);
-          Serial.println("Swirl");
-        }
-
-        // Bird
-        time = millis();
-        second = (time-start)/1000;
-        if (startUp || (time-BirdStart)/1000 > BIRD_CD) {
-          SimpleSkill(direction, BIRD);
-          BirdStart = millis();
-          delay(random(800, 1000));
-
-          Serial.print(second);
-          Serial.println("Bird");
-        }
-
-        // Monsoon
-        time = millis();
-        second = (time-start)/1000;
-        if (startUp || (time-MonsoonStart)/1000 > MONSOON_CD) {
-          SimpleSkill(direction, MONSOON);
-          MonsoonStart = millis();
-          delay(random(1500, 1700));
-
-          Serial.print(second);
-          Serial.println("Monsoon");
-        }
-
-        // Buffs
-        for (int i = 0; i < BUFF_COUNTS; i++) {
-          time = millis();
-          second = (time-start)/1000;
-          if (startUp || (time-buffStart[i])/1000 > BUFF_CD[i]) {
-            SimpleSkill(direction, BUFF[i]);
-            buffStart[i] = millis();
-            delay(random(800, 1000));
-
-            Serial.print(second);
-            Serial.println(BUFF_NAME[i]);
-          }
-        }
-
-        // Fountain
-        time = millis();
-        second = (time-start)/1000;
-        if (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD) {
-          // Move to the specific position
-          // MoveToFountain_2_6();
-          MoveToFountain_library4();
-
-          // Fountain
-          Fountain(false);
-          FountainStart = millis();
-          delay(random(800, 1000));
-
-          Serial.print(second);
-          Serial.println("Fountain");
-          
-          // Move back to origin position
-          // BackFromFountain_2_6();
-          BackFromFountain_library4();
-        }
-
-        // Money
-        time = millis();
-        second = (time-start)/1000;
-        if (startUp || (underAttack && (time-MoneyStart)/1000 > MONEY_CD)) {
-          // Collect money
-          // CollectMoney_2_6();
-          // CollectMoney_library4();
-          // CollectMoney_alley2();
-          MoneyStart = millis();
-        }
-        delay(random(50, 100));
-        startUp = false;
-      }
+      Battle(WHEEL_CD, 0, true);
     }
   }
 }
 
+void Battle(unsigned long period, int preMove, bool collectMoney) {
+  if (preMove == 1) {
+    char toCenterCommand[] = {'d', 'd', 'd'};
+    unsigned long minDelay[] = {600, 600, 600};
+    unsigned long maxDelay[] = {650, 650, 650};
+    Move(toCenterCommand, 3, minDelay, maxDelay);
+
+  } else if (preMove == 2) {
+    char toCenterCommand[] = {'d', 'd', 'd', 'd'};
+    unsigned long minDelay[] = {600, 600, 600, 600};
+    unsigned long maxDelay[] = {650, 650, 650, 650};
+    Move(toCenterCommand, 4, minDelay, maxDelay);
+
+  } else if (preMove == 3) {
+    char toCenterCommand[] = {'e', 'd', 'd'};
+    unsigned long minDelay[] = {1500, 600, 600};
+    unsigned long maxDelay[] = {1600, 650, 650};
+    Move(toCenterCommand, 3, minDelay, maxDelay);
+
+  } else if (preMove == 4) {
+    char toCenterCommand[] = {'s', 's', 's'};
+    unsigned long minDelay[] = {600, 600, 600};
+    unsigned long maxDelay[] = {650, 650, 650};
+    Move(toCenterCommand, 3, minDelay, maxDelay);
+
+  } else if (preMove == 5) {
+    char toCenterCommand[] = {'q', 'q', 'q'};
+    unsigned long minDelay[] = {1300, 1100, 1100};
+    unsigned long maxDelay[] = {1400, 1200, 1200};
+    Move(toCenterCommand, 3, minDelay, maxDelay);
+
+  } else if (preMove == 6) {
+    char toCenterCommand[] = {'d'};
+    unsigned long minDelay[] = {600};
+    unsigned long maxDelay[] = {650};
+    Move(toCenterCommand, 1, minDelay, maxDelay);
+  }
+  delay(800);
+
+  bool direction = false;
+  unsigned long start = millis();
+  unsigned long TornadoStart = start;
+  unsigned long SwirlStart = start;
+  unsigned long MonsoonStart = start;
+  unsigned long FantasyStart = start;
+  unsigned long FountainStart = start;
+  unsigned long BirdStart = start;
+  unsigned long MoneyStart = start;
+
+  unsigned long buffStart[5] = {start, start, start, start, start};
+
+  unsigned long time = millis();
+  int second = (time-start)/1000;
+  bool startUp = true;
+  while (second < period) {
+    bool underAttack = false;
+    SongOfTheSky(direction, 10, 20, 500, 1000);
+    direction = !direction;
+    
+    // Fantasy
+    if (startUp || (time-FantasyStart)/1000 > FANTASY_CD) {
+      SimpleSkill(direction, FANTASY);
+      FantasyStart = millis();
+      delay(600);
+      Serial.print(second);
+      Serial.println("Fantasy");
+    }
+        
+    // Tornado
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (time-TornadoStart)/1000 > TORNADO_CD) {
+      Tornado(direction);
+      TornadoStart = millis();
+      delay(random(700, 1000));
+      
+      Serial.print(second);
+      Serial.println("Tornado");
+      underAttack = true;
+    }
+
+    // Swirl
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (time-SwirlStart)/1000 > SWIRL_CD) {
+      Swirl(direction);
+      SwirlStart = millis();
+      delay(random(800, 1000));
+      
+      Serial.print(second);
+      Serial.println("Swirl");
+    }
+
+    // Bird
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (time-BirdStart)/1000 > BIRD_CD) {
+      SimpleSkill(direction, BIRD);
+      BirdStart = millis();
+      delay(random(800, 1000));
+        
+      Serial.print(second);
+      Serial.println("Bird");
+    }
+
+    // Monsoon
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (time-MonsoonStart)/1000 > MONSOON_CD) {
+      SimpleSkill(direction, MONSOON);
+      MonsoonStart = millis();
+      delay(random(1500, 1700));
+      
+      Serial.print(second);
+      Serial.println("Monsoon");
+    }
+
+    // Buffs
+    for (int i = 0; i < BUFF_COUNTS; i++) {
+      time = millis();
+      second = (time-start)/1000;
+      if (startUp || (time-buffStart[i])/1000 > BUFF_CD[i]) {
+        SimpleSkill(direction, BUFF[i]);
+        buffStart[i] = millis();
+        delay(random(800, 1000));
+      
+        Serial.print(second);
+        Serial.println(BUFF_NAME[i]);
+      }
+    }
+
+    // Fountain
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD) {
+      // Move to the specific position
+      // MoveToFountain_2_6();
+      MoveToFountain_library4();
+      
+      // Fountain
+      Fountain(false);
+      FountainStart = millis();
+      delay(random(800, 1000));
+
+      Serial.print(second);
+      Serial.println("Fountain");
+         
+      // Move back to origin position
+      // BackFromFountain_2_6();
+      BackFromFountain_library4();
+    }
+
+    // Money
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (underAttack && (time-MoneyStart)/1000 > MONEY_CD)) {
+      if (collectMoney) {
+      // Collect money
+      // CollectMoney_2_6();
+      // CollectMoney_library4();
+      CollectMoney_alley2();
+      }
+      MoneyStart = millis();
+    }
+    delay(random(50, 100));
+    startUp = false;
+  }
+}
+
+void GuideMoving(int index) {
+  // Open UI
+  Keyboard.write(GUIDE);
+  delay(1000);
+  // Move mouse to the first location
+  AbsoluteMouse.moveTo(GUIDE_FIRST_X, GUIDE_FIRST_Y);
+  delay(1000);
+  
+  // Move right according to the index value
+  for (int i = 0; i < index; i++) {
+    AbsoluteMouse.move(GUIDE_DISTANCE_X, 0);
+    delay(200);
+  }
+
+  // Move and wait
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(2000);
+}
 
 void DoubleJumpAttackA(bool direction, char jump, char attack) {
   if (direction == true) {
