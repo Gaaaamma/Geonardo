@@ -6,7 +6,7 @@ KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
 
-const unsigned long WHEEL_CD = 930;
+const unsigned long WHEEL_CD = 630;
 const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
@@ -18,18 +18,18 @@ const unsigned long FOUNTAIN_CD = 58;
 const char TORNADO = 'b';
 const unsigned long TORNADO_CD = 20;
 const char MONSOON = 'q';
-const unsigned long MONSOON_CD = 28;
+const unsigned long MONSOON_CD = 24;
 const char SWIRL = 'e';
-const unsigned long SWIRL_CD = 30;
+const unsigned long SWIRL_CD = 25;
 const char FANTASY = ' ';
-const unsigned long FANTASY_CD = 10;
+const unsigned long FANTASY_CD = 8;
 const char BIRD = 'v';
-const unsigned long BIRD_CD = 30;
+const unsigned long BIRD_CD = 25;
 
 const unsigned long MONEY_CD = 90; 
 
 const int BUFF_COUNTS = 5;
-const char BUFF[5] = {'3', '4', 'g', 'c', 'x'};
+const char BUFF[5] = {'2', '3', 'g', 'c', 'x'};
 const String BUFF_NAME[5] = {"Storm", "Glory", "Shilff", "Grandpa", "Critical"};
 unsigned long BUFF_CD[5] = {120, 120, 90, 150, 120};
 
@@ -79,6 +79,7 @@ void loop() {
       int second = (time-start)/1000;
       bool startUp = true;
       while (second < WHEEL_CD) {
+        bool underAttack = false;
         SongOfTheSky(direction, 10, 20, 500, 1000);
         direction = !direction;
         
@@ -101,6 +102,7 @@ void loop() {
 
           Serial.print(second);
           Serial.println("Tornado");
+          underAttack = true;
         }
 
         // Swirl
@@ -133,7 +135,7 @@ void loop() {
         if (startUp || (time-MonsoonStart)/1000 > MONSOON_CD) {
           SimpleSkill(direction, MONSOON);
           MonsoonStart = millis();
-          delay(random(1000, 1200));
+          delay(random(1500, 1700));
 
           Serial.print(second);
           Serial.println("Monsoon");
@@ -177,10 +179,11 @@ void loop() {
         // Money
         time = millis();
         second = (time-start)/1000;
-        if (startUp || (time-MoneyStart)/1000 > MONEY_CD) {
+        if (startUp || (underAttack && (time-MoneyStart)/1000 > MONEY_CD)) {
           // Collect money
           // CollectMoney_2_6();
-          CollectMoney_library4();
+          // CollectMoney_library4();
+          // CollectMoney_alley2();
           MoneyStart = millis();
         }
         delay(random(50, 100));
@@ -213,6 +216,16 @@ void DoubleJump(char jump) {
   Keyboard.write(jump);
 }
 
+void WalkLatency(bool direction, unsigned long minLatency, unsigned long maxLatency) {
+  if (direction == true) {
+    Keyboard.press(KEY_RIGHT_ARROW);
+  } else {
+    Keyboard.press(KEY_LEFT_ARROW);
+  }
+  delay(random(minLatency, maxLatency));
+  Keyboard.releaseAll();
+}
+
 void Turn(bool direction) {
   if (direction == true) {
     Keyboard.press(KEY_RIGHT_ARROW);
@@ -232,14 +245,14 @@ void UpJump(unsigned long minUp, unsigned long maxUp) {
 
   Keyboard.write(JUMP);
   Keyboard.write(JUMP);
-  delay(random(50, 100));
+  delay(random(80, 100));
   Keyboard.releaseAll();
 }
 
 void DownJump() {
   Keyboard.press(KEY_DOWN_ARROW);
   Keyboard.write(JUMP);
-  delay(random(50, 100));
+  delay(random(80, 100));
   Keyboard.releaseAll();
 }
 
@@ -379,6 +392,10 @@ void Move(char direction[], int counts, unsigned long minDelay[], unsigned long 
       DoubleJumpAttackLatency(false, 80, 100, 100, 200);
     } else if (direction[i] == 'k') {
       DoubleJumpAttackLatency(true, 80, 100, 100, 200);
+    } else if (direction[i] == 'z') {
+      WalkLatency(false, 200, 250);
+    } else if (direction[i] == 'x') {
+      WalkLatency(true, 200, 250);
     }
     delay(random(minDelay[i], maxDelay[i]));
   }
@@ -400,24 +417,33 @@ void MoveToFountain_library4() {
 void MoveToFountainA_library4() {
   char commands[] = {'e', 'd'};
   unsigned long minDelay[] = {400, 750};
-  unsigned long maxDelay[] = {450, 850};
+  unsigned long maxDelay[] = {410, 850};
   Move(commands, 2, minDelay, maxDelay);
 }
 
 void BackFromFountain_library4() {
   char commands[] = {'q', 'a'};
   unsigned long minDelay[] = {400, 900};
-  unsigned long maxDelay[] = {450, 1000};
+  unsigned long maxDelay[] = {410, 1000};
   Move(commands, 2, minDelay, maxDelay);
+}
+
+void CollectMoney_alley2() {
+  MoveToFountainA_library4();
+  delay(800);
+  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'd', 'e', 'e'};
+  unsigned long minDelay[] = {900, 580, 580, 580, 580, 580, 580, 580, 700, 700, 1000, 650, 650};
+  unsigned long maxDelay[] = {1000, 600, 600, 600, 600, 600, 600, 600, 800, 800, 1100, 700, 700};
+  Move(commands, 13, minDelay, maxDelay);
 }
 
 void CollectMoney_library4() {
   MoveToFountainA_library4();
   delay(800);
-  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'e', 'd'};
-  unsigned long minDelay[] = {900, 500, 500, 500, 500, 550, 700, 1000, 400, 900};
-  unsigned long maxDelay[] = {1000, 550, 550, 550, 550, 600, 800, 1100, 450, 1000};
-  Move(commands, 10, minDelay, maxDelay);
+  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'd', 'e', 'd'};
+  unsigned long minDelay[] = {900, 580, 580, 580, 580, 580, 580, 580, 700, 700, 1000, 400, 900};
+  unsigned long maxDelay[] = {1000, 600, 600, 600, 600, 600, 600, 600, 800, 800, 1100, 450, 1000};
+  Move(commands, 13, minDelay, maxDelay);
 }
 
 /************** 2-6 ***************/
