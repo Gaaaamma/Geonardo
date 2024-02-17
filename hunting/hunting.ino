@@ -6,7 +6,7 @@ KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
 const char GUIDE = 'u';
-const int GUIDE_DAILY_TASKS = 6;
+const int GUIDE_DAILY_TASKS = 9;
 const long GUIDE_FIRST_X = -30000;
 const long GUIDE_FIRST_Y = -2000;
 const long GUIDE_DISTANCE_X = 1650;
@@ -53,7 +53,7 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == '1') { // daily task
-      const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70};
+      const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70, 150, 150, 150};
 
       for (int i = 0; i < GUIDE_DAILY_TASKS; i++) {
         GuideMoving(i+1);
@@ -114,6 +114,20 @@ void Battle(unsigned long period, int preMove, bool collectMoney) {
     unsigned long minDelay[] = {600};
     unsigned long maxDelay[] = {650};
     Move(toCenterCommand, 1, minDelay, maxDelay);
+  } else if (preMove == 7) {
+
+  } else if (preMove == 8) {
+    char toCenterCommand[] = {'q', 's', 's'};
+    unsigned long minDelay[] = {1200, 600, 600};
+    unsigned long maxDelay[] = {1300, 650, 650};
+    Move(toCenterCommand, 3, minDelay, maxDelay);
+
+  } else if (preMove == 9) {
+    char toCenterCommand[] = {'z', 'z', 'z', 'w', 's'};
+    unsigned long minDelay[] = {300, 300, 300, 1500, 800};
+    unsigned long maxDelay[] = {350, 350, 350, 1600, 850};
+    Move(toCenterCommand, 5, minDelay, maxDelay);
+    collectMoney = true;
   }
   delay(800);
 
