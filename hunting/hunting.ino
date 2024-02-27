@@ -6,6 +6,9 @@ KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
 const char BOSS = '.';
+const char CONFIRM = 'y';
+const char ITEM = 'i';
+const char ENTER = 10;
 const int BOSS_PAGE_NUM = 14;
 const long BOSS_FIRST_X = -30000;
 const long BOSS_FIRST_Y = -23500;
@@ -14,6 +17,21 @@ const long BOSS_MOVE_Y = 1500;
 const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
+const int BOSS_COUNTS = 1;
+const int BOSS_LIST[BOSS_COUNTS] = {2};
+const long FLAME_EYE_X = -10500;
+const long FLAME_EYE_Y = -16000;
+/**
+ * 2 = 炎魔
+ * 3 = 暴君
+ * 4 = 希拉
+ * 7 = 拉圖斯
+ * 8 ~ 11 = 混4
+ * 12 = 凡雷恩
+ * 13 = 龍王
+ * 14 = 阿卡
+ * 17 = 皮卡啾
+ * */ 
 
 const char GUIDE = 'u';
 //const int GUIDE_DAILY_TASKS = 6; // daily
@@ -75,21 +93,22 @@ void loop() {
       }
 
     } else if (c == '2') {
-      // Boss move
-      BossMoving(7);
-      delay(3000);
-      BossMoving(25);
-      //char toCenterCommand[] = {'q', 'q', 'q', 'x', 'x', 'w', 's'};
-      //unsigned long minDelay[] = {1300, 1100, 1100, 300, 300, 1200, 600};
-      //unsigned long maxDelay[] = {1400, 1200, 1200, 350, 350, 1250, 650};
-      //Move(toCenterCommand, 7, minDelay, maxDelay);
-
+      for (int i = 0; i < BOSS_COUNTS; i++) {
+        int index = BOSS_LIST[i];
+        BossMoving(index);
+        delay(2000);
+        BossScript(index);
+        delay(3000);
+      }
+      
     } else if (c == '3') {
-      char test[] = {'w', 'a', 'd', 'a', 'd', 'q', 'k', 'j', 'e', 'l', 'r'};
-      unsigned long minDelay[] = {1000, 550, 550, 550, 2000, 2000, 2000, 2000, 2000, 1000, 1000};
-      unsigned long maxDelay[] = {1001, 551, 551, 551, 2001, 2001, 2001, 2001, 2001, 1001, 1001};
-      int command = 11;
-      Move(test, command, minDelay, maxDelay);
+      char command7[] = {'x', 'x'};
+      unsigned long minDelay7[] = {200, 200};
+      unsigned long maxDelay7[] = {205, 205};
+      int counts = 2;
+      Move(command7, counts, minDelay7, maxDelay7);
+      delay(1000);
+
 
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
@@ -302,10 +321,140 @@ void BossMoving(int index) {
   AbsoluteMouse.moveTo(BOSS_MOVE_X, BOSS_MOVE_Y);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
-  delay(500);
+  delay(1000);
 }
 
+void BossScript(int index) {
+  /**
+ * 2 = 炎魔
+ * 3 = 暴君
+ * 4 = 希拉
+ * 7 = 拉圖斯
+ * 8 ~ 11 = 混4
+ * 12 = 凡雷恩
+ * 13 = 龍王
+ * 14 = 阿卡
+ * 17 = 皮卡啾
+ * */ 
+  switch (index){
+  case 2:
+    // Move
+    // 1.1 Move to door
+    char command1[] = {'d', 'd', 'd', 'd', 'd', 'd', 'd', 'z', 'z'};
+    unsigned long minDelay1[] = {550, 550, 550, 550, 550, 550, 550, 445, 445};
+    unsigned long maxDelay1[] = {551, 551, 551, 551, 551, 551, 551, 450, 450};
+    int counts = 9;
+    Move(command1, counts, minDelay1, maxDelay1);
+    delay(1000);
 
+    // 1.2 Go into door
+    char command2[] = {'w', 's', 'y'};
+    unsigned long wait2[] = {700, 700, 1000};
+    counts = 3;
+    ArrowMove(command2, counts, wait2);
+    delay(1000);
+    
+    // 1.3 Go to boss room
+    char command3[] = {'d', 'd'};
+    unsigned long minDelay3[] = {550, 550};
+    unsigned long maxDelay3[] = {551, 551};
+    counts = 2;
+    Move(command3, counts, minDelay3, maxDelay3);
+
+    char command4[] = {'y', 'y'};
+    unsigned long wait4[] = {700, 700};
+    counts = 2;
+    ArrowMove(command4, counts, wait4);
+    delay(2500);
+
+    // Attack
+    WindMove(true, 100, 110);
+    delay(500);
+    Keyboard.write(ITEM);
+    delay(500);
+    AbsoluteMouse.moveTo(FLAME_EYE_X, FLAME_EYE_Y);
+    delay(500);
+    AbsoluteMouse.click(MOUSE_LEFT);
+    delay(500);
+    AbsoluteMouse.move(3000, 0);
+    delay(500);
+    AbsoluteMouse.click(MOUSE_LEFT);
+    delay(500);
+    Keyboard.write('1');
+    delay(500);
+    Keyboard.write(ENTER);
+    delay(1000);
+    Keyboard.write(ITEM);
+    delay(500);
+    
+    Tornado(true);
+    delay(10000);
+
+    // Back
+    char command5[] = {'d', 'd'};
+    unsigned long minDelay5[] = {550, 550};
+    unsigned long maxDelay5[] = {551, 551};
+    counts = 2;
+    Move(command5, counts, minDelay5, maxDelay5);
+
+    char command6[] = {'y', 'd', 'e'};
+    unsigned long wait6[] = {500, 500, 500};
+    counts = 3;
+    ArrowMove(command6, counts, wait6);
+    delay(3000);
+
+    char command7[] = {'a', 'x', 'x'};
+    unsigned long minDelay7[] = {1000, 200, 200};
+    unsigned long maxDelay7[] = {1050, 205, 205};
+    counts = 3;
+    Move(command7, counts, minDelay7, maxDelay7);
+    delay(1000);
+    
+    char command8[] = {'w'};
+    unsigned long wait8[] = {1000};
+    counts = 1;
+    ArrowMove(command8, counts, wait8);
+    delay(3000);
+    break;
+  
+  default:
+    break;
+  }
+}
+
+void ArrowMove(char direction[], int counts, unsigned long wait[]) {
+  for (int i = 0; i < counts; i++) {
+    switch (direction[i]) {
+    case 'w':
+      Keyboard.write(KEY_UP_ARROW);
+      delay(wait[i]);
+      break;
+    case 's':
+      Keyboard.write(KEY_DOWN_ARROW);
+      delay(wait[i]);
+      break;
+    case 'a':
+      Keyboard.write(KEY_LEFT_ARROW);
+      delay(wait[i]);
+      break;
+    case 'd':
+      Keyboard.write(KEY_RIGHT_ARROW);
+      delay(wait[i]);
+      break;
+    case 'y':
+      Keyboard.write(CONFIRM);
+      delay(wait[i]);
+      break;
+    case 'e':
+      Keyboard.write(ENTER);
+      delay(wait[i]);
+      break;
+    
+    default:
+      break;
+    }
+  }
+}
 
 // Daily task
 void GuideMoving(int index) {
