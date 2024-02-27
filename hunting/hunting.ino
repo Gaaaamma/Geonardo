@@ -5,8 +5,19 @@ KEY_LEFT_ARROW
 KEY_RIGHT_ARROW
 */
 #include "HID-Project.h"
+const char BOSS = '.';
+const int BOSS_PAGE_NUM = 14;
+const long BOSS_FIRST_X = -30000;
+const long BOSS_FIRST_Y = -23500;
+const long BOSS_MOVE_X = -15000;
+const long BOSS_MOVE_Y = 1500;
+const long BOSS_NEXT_PAGE_X = -30000;
+const long BOSS_NEXT_PAGE_Y = 4000;
+const long BOSS_DISTANCE_Y = 2000;
+
 const char GUIDE = 'u';
-const int GUIDE_DAILY_TASKS = 9;
+//const int GUIDE_DAILY_TASKS = 6; // daily
+const int GUIDE_DAILY_TASKS = 9; // daily
 const long GUIDE_FIRST_X = -30000;
 const long GUIDE_FIRST_Y = -2000;
 const long GUIDE_DISTANCE_X = 1650;
@@ -53,17 +64,25 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == '1') { // daily task
+      //const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 200, 300, 150, 150, 150};
       const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70, 150, 150, 150};
 
-      for (int i = 0; i < GUIDE_DAILY_TASKS; i++) {
+      for (int i = 0; i < GUIDE_DAILY_TASKS; i++) { // daily
         GuideMoving(i+1);
         delay(500);
-        Battle(BATTLE_TIME[i], i+1, false);
+        Battle(BATTLE_TIME[i], i+1, false, false);
         delay(3000);
       }
 
     } else if (c == '2') {
-      CollectMoney_library4();
+      // Boss move
+      BossMoving(7);
+      delay(3000);
+      BossMoving(25);
+      //char toCenterCommand[] = {'q', 'q', 'q', 'x', 'x', 'w', 's'};
+      //unsigned long minDelay[] = {1300, 1100, 1100, 300, 300, 1200, 600};
+      //unsigned long maxDelay[] = {1400, 1200, 1200, 350, 350, 1250, 650};
+      //Move(toCenterCommand, 7, minDelay, maxDelay);
 
     } else if (c == '3') {
       char test[] = {'w', 'a', 'd', 'a', 'd', 'q', 'k', 'j', 'e', 'l', 'r'};
@@ -73,12 +92,12 @@ void loop() {
       Move(test, command, minDelay, maxDelay);
 
     } else if (c == '0') {
-      Battle(WHEEL_CD, 0, true);
+      Battle(WHEEL_CD, 0, true, true);
     }
   }
 }
 
-void Battle(unsigned long period, int preMove, bool collectMoney) {
+void Battle(unsigned long period, int preMove, bool useFountain, bool collectMoney) {
   if (preMove == 1) {
     char toCenterCommand[] = {'d', 'd', 'd'};
     unsigned long minDelay[] = {600, 600, 600};
@@ -104,16 +123,17 @@ void Battle(unsigned long period, int preMove, bool collectMoney) {
     Move(toCenterCommand, 3, minDelay, maxDelay);
 
   } else if (preMove == 5) {
-    char toCenterCommand[] = {'q', 'q', 'q'};
-    unsigned long minDelay[] = {1300, 1100, 1100};
-    unsigned long maxDelay[] = {1400, 1200, 1200};
-    Move(toCenterCommand, 3, minDelay, maxDelay);
+    char toCenterCommand[] = {'q', 'q', 'q', 'x', 'x', 'x', 'w', 's'};
+    unsigned long minDelay[] = {1300, 1100, 1100, 300, 300, 300, 1200, 600};
+    unsigned long maxDelay[] = {1400, 1200, 1200, 350, 350, 350, 1250, 650};
+    Move(toCenterCommand, 8, minDelay, maxDelay);
 
   } else if (preMove == 6) {
-    char toCenterCommand[] = {'d'};
-    unsigned long minDelay[] = {600};
-    unsigned long maxDelay[] = {650};
-    Move(toCenterCommand, 1, minDelay, maxDelay);
+    char toCenterCommand[] = {'d', 'w', 's', 'z', 'z'};
+    unsigned long minDelay[] = {600, 1000, 600, 300, 300};
+    unsigned long maxDelay[] = {650, 1200, 650, 350, 350};
+    Move(toCenterCommand, 5, minDelay, maxDelay);
+
   } else if (preMove == 7) {
 
   } else if (preMove == 8) {
@@ -226,7 +246,7 @@ void Battle(unsigned long period, int preMove, bool collectMoney) {
     // Fountain
     time = millis();
     second = (time-start)/1000;
-    if (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD) {
+    if (useFountain && (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD)) {
       // Move to the specific position
       // MoveToFountain_2_6();
       MoveToFountain_library4();
@@ -261,6 +281,33 @@ void Battle(unsigned long period, int preMove, bool collectMoney) {
   }
 }
 
+// Daily boss
+void BossMoving(int index) {
+  // Open UI
+  Keyboard.write(BOSS);
+  delay(1000);
+
+  if (index / BOSS_PAGE_NUM > 0) {
+    // Need to go to next page
+    AbsoluteMouse.moveTo(BOSS_NEXT_PAGE_X, BOSS_NEXT_PAGE_Y);
+    delay(1000);
+    AbsoluteMouse.click(MOUSE_LEFT);
+    delay(1000);
+  }
+  // Move mouse to the BOSS location
+  AbsoluteMouse.moveTo(BOSS_FIRST_X, BOSS_FIRST_Y + (index % BOSS_PAGE_NUM) * BOSS_DISTANCE_Y);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  AbsoluteMouse.moveTo(BOSS_MOVE_X, BOSS_MOVE_Y);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+}
+
+
+
+// Daily task
 void GuideMoving(int index) {
   // Open UI
   Keyboard.write(GUIDE);
