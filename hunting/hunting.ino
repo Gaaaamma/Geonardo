@@ -18,7 +18,7 @@ const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
 const int BOSS_COUNTS = 1;
-const int BOSS_LIST[BOSS_COUNTS] = {2, 3};
+const int BOSS_LIST[BOSS_COUNTS] = {4};
 const long FLAME_EYE_X = -10500;
 const long FLAME_EYE_Y = -16000;
 /**
@@ -102,18 +102,7 @@ void loop() {
       }
       
     } else if (c == '3') {
-      char command6[] = {'q', 'q', 'q', 'x'};
-      unsigned long minDelay6[] = {700, 700, 700, 300};
-      unsigned long maxDelay6[] = {750, 750, 750, 305};
-      int counts = 4;
-      Move(command6, counts, minDelay6, maxDelay6);
-
-      char command7[] = {'w'};
-      unsigned long wait7[] = {1000};
-      counts = 1;
-      ArrowMove(command7, counts, wait7);
-      delay(3000);
-
+      Hilla();
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
     }
@@ -349,6 +338,10 @@ void BossScript(int index) {
     Magnus(10);
     break;
 
+  case 4:
+    Hilla();
+    break;
+
   default:
     break;
   }
@@ -551,6 +544,113 @@ void Magnus(unsigned long period) {
   counts = 1;
   ArrowMove(command7, counts, wait7);
   delay(3000);
+}
+
+void Hilla() {
+  // Move
+  // 1.1 Move to door
+  char command1[] = {'q', 'q', 'd', 'd', 'd', 'd'};
+  unsigned long minDelay1[] = {700, 700, 700, 700, 700, 700};
+  unsigned long maxDelay1[] = {750, 750, 750, 750, 750, 750};
+  int counts = 6;
+  Move(command1, counts, minDelay1, maxDelay1);
+  delay(1000);
+
+  // 1.2 Go into door
+  char command2[] = {'y', 'y', 'y'};
+  unsigned long wait2[] = {700, 700, 700};
+  counts = 3;
+  ArrowMove(command2, counts, wait2);
+  delay(2500);
+
+  // Level1
+  SimpleSkill(true, FANTASY);
+  delay(600);
+  WalkingSongSky(60);
+  delay(500);
+  char command3[] = {'e', 'e', 'z', 'z', 'z'};
+  unsigned long minDelay3[] = {700, 700, 200, 200, 200};
+  unsigned long maxDelay3[] = {750, 750, 220, 220, 220};
+  counts = 5;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(1000);
+  Turn(true);
+  Turn(true);
+  delay(500);
+
+  char command4[] = {'w'};
+  unsigned long wait4[] = {500};
+  counts = 1;
+  ArrowMove(command4, counts, wait4);
+  delay(300);
+  Turn(false);
+  SongOfTheSky(false, 5, 10, 2500, 2600);
+  delay(500);
+  Turn(true);
+  Turn(true);
+  ArrowMove(command4, counts, wait4);
+  delay(2000);
+
+  // Level2
+  SimpleSkill(true, FANTASY);
+  delay(600);
+  WalkingSongSky(60);
+  delay(500);
+  counts = 5;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(1000);
+  Turn(true);
+  Turn(true);
+  delay(500);
+  
+  counts = 1;
+  ArrowMove(command4, counts, wait4);
+  delay(300);
+  Turn(false);
+  SongOfTheSky(false, 5, 10, 2500, 2600);
+  delay(500);
+  Turn(true);
+  Turn(true);
+  ArrowMove(command4, counts, wait4);
+  delay(2000);
+
+  // Boss 
+  WalkingSongSky(40);
+  delay(500);
+  char command5[] = {'e', 'e', 'q', 'q', 'q', 'q', 'q'};
+  unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700, 700};
+  unsigned long maxDelay5[] = {730, 730, 730, 730, 730, 730, 730};
+  counts = 7;
+  Move(command5, counts, minDelay5, maxDelay5);
+  delay(1000);
+
+  // Back
+  AbsoluteMouse.moveTo(-25500, -2000);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  char command6[] = {'d', 'e'};
+  unsigned long wait6[] = {700, 700};
+  counts = 2;
+  ArrowMove(command6, counts, wait6);
+  delay(2500);
+
+  char command7[] = {'q', 'q', 'x'};
+  unsigned long minDelay7[] = {700, 700, 250};
+  unsigned long maxDelay7[] = {730, 730, 270};
+  counts = 3;
+  Move(command7, counts, minDelay7, maxDelay7);
+  Turn(true);
+  Turn(true);
+  delay(300);
+  ArrowMove(command4, counts, wait4);
+  delay(2500);
+}
+
+void WalkingSongSky(int times) {
+  for (int i = 0; i < times; i++) {
+    SongOfTheSky(true, 100, 105, 50, 55);
+  }
 }
 
 // Daily task
