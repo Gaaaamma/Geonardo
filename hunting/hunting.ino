@@ -17,8 +17,8 @@ const long BOSS_MOVE_Y = 1500;
 const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
-const int BOSS_COUNTS = 1;
-const int BOSS_LIST[BOSS_COUNTS] = {4};
+const int BOSS_COUNTS = 3;
+const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4};
 const long FLAME_EYE_X = -10500;
 const long FLAME_EYE_Y = -16000;
 /**
@@ -61,11 +61,11 @@ const char FANTASY = ' ';
 const unsigned long FANTASY_CD = 8;
 const char BIRD = 'v';
 const unsigned long BIRD_CD = 25;
-
+const char C2F = 'g';
 const unsigned long MONEY_CD = 90; 
 
 const int BUFF_COUNTS = 5;
-const char BUFF[5] = {'2', '3', 'g', 'c', 'x'};
+const char BUFF[5] = {'2', '3', C2F, 'c', 'x'};
 const String BUFF_NAME[5] = {"Storm", "Glory", "Shilff", "Grandpa", "Critical"};
 unsigned long BUFF_CD[5] = {120, 120, 90, 150, 120};
 
@@ -483,10 +483,14 @@ void Magnus(unsigned long period) {
   int counts = 4;
   Move(command1, counts, minDelay1, maxDelay1);
   delay(1000);
-
+  for (int i = 0; i < 5; i++) {
+    Turn(true);
+    delay(100);
+  }
+  delay(1000);
   // 1.2 Go into door
   char command2[] = {'w', 's', 'y'};
-  unsigned long wait2[] = {700, 700, 1000};
+  unsigned long wait2[] = {800, 800, 1000};
   counts = 3;
   ArrowMove(command2, counts, wait2);
   delay(2500);
@@ -499,7 +503,8 @@ void Magnus(unsigned long period) {
   counts = 2;
   Move(command3, counts, minDelay3, maxDelay3);
   delay(1000);
-
+  SimpleSkill(true, C2F);
+  delay(500);
   bool direction = true;
   unsigned long start = millis();
   unsigned long time = millis();
@@ -517,10 +522,10 @@ void Magnus(unsigned long period) {
   }
 
   // Back
-  char command4[] = {'q', 'q', 'q'};
-  unsigned long minDelay4[] = {700, 700, 700};
-  unsigned long maxDelay4[] = {750, 750, 750};
-  counts = 3;
+  char command4[] = {'e', 'q', 'q', 'q'};
+  unsigned long minDelay4[] = {800, 700, 700, 700};
+  unsigned long maxDelay4[] = {850, 750, 750, 750};
+  counts = 4;
   Move(command4, counts, minDelay4, maxDelay4);
   
   AbsoluteMouse.moveTo(-26500, 0);
