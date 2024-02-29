@@ -645,8 +645,10 @@ void Hilla() {
   unsigned long maxDelay7[] = {730, 730, 270};
   counts = 3;
   Move(command7, counts, minDelay7, maxDelay7);
-  Turn(true);
-  Turn(true);
+  for (int i = 0; i < 5; i++) {
+    Turn(true);
+    delay(100);
+  }
   delay(300);
   ArrowMove(command4, counts, wait4);
   delay(2500);
