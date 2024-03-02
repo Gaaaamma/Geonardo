@@ -21,6 +21,10 @@ const int BOSS_COUNTS = 3;
 const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4};
 const long LEFT_TOP_ITEM_X = -31500;
 const long LEFT_TOP_ITEM_Y = -28000;
+const long MAGNUS_OUT_SEAT_X = -26500;
+const long MAGNUS_OUT_SEAT_Y = 0;
+const long HILLA_OUT_SEAT_X = -25500;
+const long HILLA_OUT_SEAT_Y = -2000;
 /**
  * 2 = 炎魔
  * 3 = 暴君
@@ -590,7 +594,7 @@ void Magnus(unsigned long period) {
   counts = 4;
   Move(command4, counts, minDelay4, maxDelay4);
   
-  AbsoluteMouse.moveTo(-26500, 0);
+  AbsoluteMouse.moveTo(MAGNUS_OUT_SEAT_X, MAGNUS_OUT_SEAT_Y);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
@@ -692,7 +696,7 @@ void Hilla() {
   delay(1000);
 
   // Back
-  AbsoluteMouse.moveTo(-25500, -2000);
+  AbsoluteMouse.moveTo(HILLA_OUT_SEAT_X, HILLA_OUT_SEAT_Y);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
