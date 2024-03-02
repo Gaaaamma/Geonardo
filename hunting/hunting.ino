@@ -133,10 +133,10 @@ void loop() {
       int test_index = 7;
       BossMoving(test_index);
       delay(2000);
-      Papulatus();
+      Papulatus(10);
       
     } else if (c == '4') {
-
+      
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
     }
@@ -377,7 +377,7 @@ void BossScript(int index) {
     break;
 
   case 7:
-    Papulatus();
+    Papulatus(10);
     break;
     
   case 8:
@@ -720,7 +720,7 @@ void Hilla() {
   delay(2500);
 }
 
-void Papulatus() {
+void Papulatus(unsigned long period) { // period: second
   // Move
   // 1.1 Move to door
   char command1[] = {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
@@ -733,14 +733,14 @@ void Papulatus() {
   Move(command1, counts, minDelay1, maxDelay1);
   delay(1000);
 
-  SlightMove(false, 10);
+  SlightMove(false, 6);
 
   // 1.2 Go into door
   char command2[] = {'w', 's', 'y', 'y', 'y'};
   unsigned long wait2[] = {700, 700, 700, 700, 700};
   counts = 5;
   ArrowMove(command2, counts, wait2);
-  delay(2500);
+  delay(2000);
 
   // 1.3 Throw the item
   char command3[] = {'d', 'd', 'd', 'd', 'w', 'z'};
@@ -762,7 +762,47 @@ void Papulatus() {
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
   Keyboard.write(ITEM);
+  delay(2000);
+
+  // Attack 
+  SlightMove(true, 10);
+  Tornado(false);
+  delay(random(800, 1000));
+  Swirl(false);
+  delay(random(800, 1000));
+  SimpleSkill(false, FANTASY);
+  delay(600);
+  SongOfTheSky(false, 5, 15, (period-1)*1000, (period+1)*1000);
+  delay(1000);
+
+  // Back
+  char command4[] = {'s', 'a', 'a', 'a'};
+  unsigned long minDelay4[] = {1000, 650, 650, 650};
+  unsigned long maxDelay4[] = {1100, 700, 700, 700};
+  counts = 4;
+  Move(command4, counts, minDelay4, maxDelay4);
   delay(500);
+
+  char command5[] = {'y', 'd', 'e'};
+  unsigned long wait5[] = {700, 700, 700};
+  counts = 3;
+  ArrowMove(command5, counts, wait5);
+  delay(2000);
+  
+  char command6[] = {'a', 'x'};
+  unsigned long minDelay6[] = {700, 700};
+  unsigned long maxDelay6[] = {750, 750};
+  counts = 2;
+  Move(command6, counts, minDelay6, maxDelay6);
+  
+  SlightMove(true, 10);
+  delay(300);
+
+  char command7[] = {'w'};
+  unsigned long wait7[] = {1000};
+  counts = 1;
+  ArrowMove(command7, counts, wait7);
+  delay(3000);
 }
 
 void WalkingSongSky(int times) {
