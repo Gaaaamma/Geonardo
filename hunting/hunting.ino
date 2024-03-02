@@ -25,7 +25,7 @@ const long MAGNUS_OUT_SEAT_X = -26500;
 const long MAGNUS_OUT_SEAT_Y = 0;
 const long HILLA_OUT_SEAT_X = -25500;
 const long HILLA_OUT_SEAT_Y = -2000;
-const long CHAOS4_OUT_X = -25500;
+const long CHAOS4_OUT_X = -30000;
 const long CHAOS4_OUT_Y = -2000;
 /**
  * 2 = 炎魔
@@ -148,7 +148,7 @@ void loop() {
       int test_index = 8;
       BossMoving(test_index);
       delay(2000);
-      // Pierre();
+      Pierre();
       
     } else if (c == '4') {
       WalkingSongSky(true, 40);
@@ -823,7 +823,66 @@ void Papulatus(unsigned long period) { // period: second
 }
 
 void Pierre() {
+    // Move
+  // 1.1 Move to door
+  char command1[] = {'a'};
+  unsigned long minDelay1[] = {650};
+  unsigned long maxDelay1[] = {670};
+  int counts = 1;
+  Move(command1, counts, minDelay1, maxDelay1);
+  delay(1000);
 
+  // 1.2 Go into door
+  char command2[] = {'y', 'y'};
+  unsigned long wait2[] = {700, 700};
+  counts = 2;
+  ArrowMove(command2, counts, wait2);
+  delay(1500);
+
+  // Level1
+  SimpleSkill(true, FANTASY);
+  delay(600);
+  WalkingSongSky(true, 80);
+  delay(500);
+  char command3[] = {'e', 'a'};
+  unsigned long minDelay3[] = {700, 700};
+  unsigned long maxDelay3[] = {750, 750};
+  counts = 2;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(1000);
+  SlightMove(true, 15);
+
+  char command4[] = {'w', 'd', 'e'};
+  unsigned long wait4[] = {500, 500, 500};
+  counts = 3;
+  ArrowMove(command4, counts, wait4);
+  delay(1000);
+
+  // Boss
+  SimpleSkill(true, FANTASY);
+  delay(600);
+  SongOfTheSky(true, 10, 15, 5000, 5500);
+  delay(2000);
+  SimpleSkill(true, ATTACK);
+  delay(2000);
+
+  // Back
+  char command5[] = {'e', 'e', 'q', 'q', 'q', 'q'};
+  unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700};
+  unsigned long maxDelay5[] = {730, 730, 730, 730, 730, 730};
+  counts = 6;
+  Move(command5, counts, minDelay5, maxDelay5);
+  delay(1000);
+
+  AbsoluteMouse.moveTo(CHAOS4_OUT_X, CHAOS4_OUT_Y);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  char command6[] = {'d', 'e'};
+  unsigned long wait6[] = {700, 700};
+  counts = 2;
+  ArrowMove(command6, counts, wait6);
+  delay(2500);
 }
 
 // ====================== Daily task ======================
