@@ -34,8 +34,6 @@ const long FLAME_EYE_Y = -16000;
  * */ 
 
 const char GUIDE = 'u';
-//const int GUIDE_DAILY_TASKS = 6; // daily
-const int GUIDE_DAILY_TASKS = 9; // daily
 const long GUIDE_FIRST_X = -30000;
 const long GUIDE_FIRST_Y = -2000;
 const long GUIDE_DISTANCE_X = 1650;
@@ -82,10 +80,36 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == '1') { // daily task
-      //const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 200, 300, 150, 150, 150};
-      const unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70, 150, 150, 150};
+      Serial.println("Input 'a' for 6 tasks, 'b' for 9 tasks");
+      WaitInput();
+      char next = Serial.read();
+      unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70, 150, 150, 150};
+      int GUIDE_DAILY_TASKS = 9; // daily
 
-      for (int i = 0; i < GUIDE_DAILY_TASKS; i++) { // daily
+      if (next == 'a') {
+        BATTLE_TIME[4] = 100;
+        BATTLE_TIME[5] = 200;
+        GUIDE_DAILY_TASKS = 6;
+        Serial.println("Input start task (0 ~ 5)");
+
+      } else if (next == 'b') {
+        Serial.println("Input start task (0 ~ 8)");
+
+      } else {
+        Serial.print("Invalid command: ");
+        Serial.println(next);
+        return;
+      }
+      WaitInput();
+      int start = (int)Serial.read() - '0';
+      if (start < 0 || start >= GUIDE_DAILY_TASKS) {
+        Serial.print("Invliad start task number: ");
+        Serial.println(start);
+        return;
+      }
+      delay(3000);
+      
+      for (int i = start; i < GUIDE_DAILY_TASKS; i++) { // daily
         GuideMoving(i+1);
         delay(500);
         Battle(BATTLE_TIME[i], i+1, false, false);
@@ -102,7 +126,10 @@ void loop() {
       }
       
     } else if (c == '3') {
-      Hilla();
+      WaitInput();
+      char next = Serial.read();
+      Serial.println(next);
+      
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
     }
@@ -1014,3 +1041,8 @@ void CollectMoneyA_2_6() {
 }
 
 /**********************************/
+void WaitInput() {
+  for (;Serial.available() <= 0;) {
+    // Waiting input
+  }
+}
