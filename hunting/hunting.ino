@@ -17,14 +17,16 @@ const long BOSS_MOVE_Y = 1500;
 const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
-const int BOSS_COUNTS = 4;
-const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4, 7};
+const int BOSS_COUNTS = 12;
+const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 17};
 const long LEFT_TOP_ITEM_X = -31500;
 const long LEFT_TOP_ITEM_Y = -28000;
 const long MAGNUS_OUT_SEAT_X = -26500;
 const long MAGNUS_OUT_SEAT_Y = 0;
 const long HILLA_OUT_SEAT_X = -25500;
 const long HILLA_OUT_SEAT_Y = -2000;
+const long CHAOS4_OUT_X = -25500;
+const long CHAOS4_OUT_Y = -2000;
 /**
  * 2 = 炎魔
  * 3 = 暴君
@@ -50,6 +52,7 @@ const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
 const char SONG_SKY = 'a';
 const char ROPE = 't';
+const char ATTACK = 't';
 
 const char FOUNTAIN = 'z';
 const unsigned long FOUNTAIN_CD = 58; 
@@ -142,13 +145,15 @@ void loop() {
       }
       
     } else if (c == '3') {
-      int test_index = 7;
+      int test_index = 8;
       BossMoving(test_index);
       delay(2000);
-      Papulatus(10);
+      // Pierre();
       
     } else if (c == '4') {
-      
+      WalkingSongSky(true, 40);
+      delay(1000);
+      WalkingSongSky(false, 60);
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
     }
@@ -393,7 +398,7 @@ void BossScript(int index) {
     break;
     
   case 8:
-    // Pierre();
+    Pierre();
     break;
     
   case 9:
@@ -463,7 +468,7 @@ void ArrowMove(char direction[], int counts, unsigned long wait[]) {
   }
 }
 
-void Zakum(unsigned long period) {
+void Zakum(unsigned long period) { // period: second
   // Move
   // 1.1 Move to door
   char command1[] = {'d', 'd', 'd', 'd', 'd', 'd', 'd', 'z', 'z'};
@@ -552,7 +557,7 @@ void Zakum(unsigned long period) {
   delay(3000);
 }
 
-void Magnus(unsigned long period) {
+void Magnus(unsigned long period) { // period: second
   // Move
   // 1.1 Move to door
   char command1[] = {'d', 'e', 'z', 'z'};
@@ -649,7 +654,7 @@ void Hilla() {
   // Level1
   SimpleSkill(true, FANTASY);
   delay(600);
-  WalkingSongSky(60);
+  WalkingSongSky(true, 60);
   delay(500);
   char command3[] = {'e', 'e', 'z', 'z', 'z'};
   unsigned long minDelay3[] = {700, 700, 200, 200, 200};
@@ -677,7 +682,7 @@ void Hilla() {
   // Level2
   SimpleSkill(true, FANTASY);
   delay(600);
-  WalkingSongSky(60);
+  WalkingSongSky(true, 60);
   delay(500);
   counts = 5;
   Move(command3, counts, minDelay3, maxDelay3);
@@ -698,7 +703,7 @@ void Hilla() {
   delay(2000);
 
   // Boss 
-  WalkingSongSky(40);
+  WalkingSongSky(true, 40);
   delay(500);
   char command5[] = {'e', 'e', 'q', 'q', 'q', 'q', 'q'};
   unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700, 700};
@@ -817,10 +822,8 @@ void Papulatus(unsigned long period) { // period: second
   delay(3000);
 }
 
-void WalkingSongSky(int times) {
-  for (int i = 0; i < times; i++) {
-    SongOfTheSky(true, 100, 105, 50, 55);
-  }
+void Pierre() {
+
 }
 
 // ====================== Daily task ======================
@@ -977,6 +980,12 @@ unsigned long SongOfTheSky(bool direction, unsigned long minWalk, unsigned long 
   delay(random(minDuration, maxDuration));
   Keyboard.releaseAll();
   return distance;
+}
+
+void WalkingSongSky(bool direction, int times) {
+  for (int i = 0; i < times; i++) {
+    SongOfTheSky(direction, 100, 105, 50, 55);
+  }
 }
 
 void Fountain(bool direction) {
