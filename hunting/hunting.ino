@@ -120,8 +120,20 @@ void loop() {
         delay(3000);
       }
 
-    } else if (c == '2') {
-      for (int i = 0; i < BOSS_COUNTS; i++) {
+    } else if (c == '2') { // daily boss
+      Serial.print("Input start index of boss (0 ~ ");
+      Serial.print(BOSS_COUNTS-1);
+      Serial.println(")");
+      Serial.println("Index map:\n0: Zakum, 1: Magnus, 2: Hilla, 3: Papulatus\n4: Pierre, 5: VonBon, 6: Queen, 7: Vellum\n8: VonLeon, 9: Horntail, 10: Arkarium, 11: PinkBean");
+      WaitInput();
+      int start = (int)Serial.read() - '0';
+      if (start < 0 || start >= BOSS_COUNTS) {
+        Serial.print("Invliad start boss index: ");
+        Serial.println(start);
+        return;
+      }
+      delay(3000);
+      for (int i = start; i < BOSS_COUNTS; i++) {
         int index = BOSS_LIST[i];
         BossMoving(index);
         delay(2000);
