@@ -19,8 +19,6 @@ const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
 const int BOSS_COUNTS = 3;
 const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4};
-const long FLAME_EYE_X = -10500;
-const long FLAME_EYE_Y = -16000;
 const long LEFT_TOP_ITEM_X = -31500;
 const long LEFT_TOP_ITEM_Y = -28000;
 /**
@@ -134,7 +132,7 @@ void loop() {
       Papulatus();
       
     } else if (c == '4') {
-  
+
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
     }
@@ -453,8 +451,8 @@ void Zakum(unsigned long period) {
   // Move
   // 1.1 Move to door
   char command1[] = {'d', 'd', 'd', 'd', 'd', 'd', 'd', 'z', 'z'};
-  unsigned long minDelay1[] = {550, 550, 550, 550, 550, 550, 550, 445, 445};
-  unsigned long maxDelay1[] = {551, 551, 551, 551, 551, 551, 551, 450, 450};
+  unsigned long minDelay1[] = {550, 550, 550, 550, 550, 550, 550, 800, 445};
+  unsigned long maxDelay1[] = {551, 551, 551, 551, 551, 551, 551, 805, 450};
   int counts = 9;
   Move(command1, counts, minDelay1, maxDelay1);
   delay(1000);
@@ -473,9 +471,9 @@ void Zakum(unsigned long period) {
   counts = 2;
   Move(command3, counts, minDelay3, maxDelay3);
 
-  char command4[] = {'y', 'y'};
-  unsigned long wait4[] = {700, 700};
-  counts = 2;
+  char command4[] = {'y', 'y', 'y', 'y'};
+  unsigned long wait4[] = {700, 700, 700, 700};
+  counts = 4;
   ArrowMove(command4, counts, wait4);
   delay(2500);
 
@@ -485,7 +483,7 @@ void Zakum(unsigned long period) {
   delay(500);
   Keyboard.write(ITEM);
   delay(500);
-  AbsoluteMouse.moveTo(FLAME_EYE_X, FLAME_EYE_Y);
+  AbsoluteMouse.moveTo(LEFT_TOP_ITEM_X, LEFT_TOP_ITEM_Y);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
@@ -493,10 +491,6 @@ void Zakum(unsigned long period) {
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
-  Keyboard.write('1');
-  delay(500);
-  Keyboard.write(ENTER);
-  delay(1000);
   Keyboard.write(ITEM);
   delay(500);
   
@@ -762,6 +756,8 @@ void Papulatus() {
   AbsoluteMouse.moveTo(0, 0);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  Keyboard.write(ITEM);
   delay(500);
 }
 
