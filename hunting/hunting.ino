@@ -21,6 +21,8 @@ const int BOSS_COUNTS = 3;
 const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4};
 const long FLAME_EYE_X = -10500;
 const long FLAME_EYE_Y = -16000;
+const long LEFT_TOP_ITEM_X = -31500;
+const long LEFT_TOP_ITEM_Y = -28000;
 /**
  * 2 = 炎魔
  * 3 = 暴君
@@ -126,10 +128,13 @@ void loop() {
       }
       
     } else if (c == '3') {
-      WaitInput();
-      char next = Serial.read();
-      Serial.println(next);
+      int test_index = 7;
+      BossMoving(test_index);
+      delay(2000);
+      Papulatus();
       
+    } else if (c == '4') {
+  
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
     }
@@ -320,7 +325,7 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
   }
 }
 
-// Daily boss
+// ====================== Daily boss ======================
 void BossMoving(int index) {
   // Open UI
   Keyboard.write(BOSS);
@@ -369,6 +374,42 @@ void BossScript(int index) {
     Hilla();
     break;
 
+  case 7:
+    Papulatus();
+    break;
+    
+  case 8:
+    // Pierre();
+    break;
+    
+  case 9:
+    // VonBon();
+    break;
+    
+  case 10:
+    // Queen();
+    break;
+    
+  case 11:
+    // Vellum();
+    break;
+    
+  case 12:
+    // VonLeon();
+    break;
+    
+  case 13:
+    // Horntail();
+    break;
+    
+  case 14:
+    // Arkarium();
+    break;
+    
+  case 17:
+    // PinkBean();
+    break;
+    
   default:
     break;
   }
@@ -448,7 +489,7 @@ void Zakum(unsigned long period) {
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
-  AbsoluteMouse.move(3000, 0);
+  AbsoluteMouse.moveTo(0, 0);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
@@ -681,13 +722,56 @@ void Hilla() {
   delay(2500);
 }
 
+void Papulatus() {
+  // Move
+  // 1.1 Move to door
+  char command1[] = {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
+    'd', 'd', 'd', 'd', 'd', 'd', 'x', 'w'};
+  unsigned long minDelay1[] = {650, 650, 650, 650, 650, 650,
+    650, 650, 650, 650, 650, 650, 650, 650, 300, 1200};
+  unsigned long maxDelay1[] = {700, 700, 700, 700, 700, 700,
+    700, 700, 700, 700, 700, 700, 700, 700, 320, 1250};
+  int counts = 16;
+  Move(command1, counts, minDelay1, maxDelay1);
+  delay(1000);
+
+  SlightMove(false, 10);
+
+  // 1.2 Go into door
+  char command2[] = {'w', 's', 'y', 'y', 'y'};
+  unsigned long wait2[] = {700, 700, 700, 700, 700};
+  counts = 5;
+  ArrowMove(command2, counts, wait2);
+  delay(2500);
+
+  // 1.3 Throw the item
+  char command3[] = {'d', 'd', 'd', 'd', 'w', 'z'};
+  unsigned long minDelay3[] = {650, 650, 650, 650, 1600, 300};
+  unsigned long maxDelay3[] = {700, 700, 700, 700, 1650, 320};
+  counts = 6;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(1000);
+  SlightMove(true, 10);
+
+  Keyboard.write(ITEM);
+  delay(500);
+  AbsoluteMouse.moveTo(LEFT_TOP_ITEM_X, LEFT_TOP_ITEM_Y);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  AbsoluteMouse.moveTo(0, 0);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+}
+
 void WalkingSongSky(int times) {
   for (int i = 0; i < times; i++) {
     SongOfTheSky(true, 100, 105, 50, 55);
   }
 }
 
-// Daily task
+// ====================== Daily task ======================
 void GuideMoving(int index) {
   // Open UI
   Keyboard.write(GUIDE);
@@ -748,6 +832,14 @@ void Turn(bool direction) {
   delay(30);
   Keyboard.releaseAll();
   delay(100);
+}
+
+void SlightMove(bool direction, int times) {
+  for (int i = 0; i < times; i++) {
+    Turn(direction);
+    delay(100);
+  }
+  delay(300);
 }
 
 // minUp maxUp will affect the height of UpJump
