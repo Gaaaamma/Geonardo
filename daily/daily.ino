@@ -17,18 +17,10 @@ const long BOSS_MOVE_Y = 1500;
 const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
-const int BOSS_COUNTS = 12;
-const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 17};
-const long LEFT_TOP_ITEM_X = -31500;
-const long LEFT_TOP_ITEM_Y = -28000;
-const long MAGNUS_OUT_SEAT_X = -26500;
-const long MAGNUS_OUT_SEAT_Y = 0;
-const long HILLA_OUT_SEAT_X = -25500;
-const long HILLA_OUT_SEAT_Y = -2000;
-const long CHAOS4_OUT_X = -30000;
-const long CHAOS4_OUT_Y = -2000;
-const long CHAOS4_ACTIVATE_X = 0;
-const long CHAOS4_ACTIVATE_Y = 0;
+const int BOSS_COUNTS = 3;
+const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4};
+const long FLAME_EYE_X = -10500;
+const long FLAME_EYE_Y = -16000;
 /**
  * 2 = 炎魔
  * 3 = 暴君
@@ -54,7 +46,6 @@ const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
 const char SONG_SKY = 'a';
 const char ROPE = 't';
-const char ATTACK = 't';
 
 const char FOUNTAIN = 'z';
 const unsigned long FOUNTAIN_CD = 58; 
@@ -125,20 +116,8 @@ void loop() {
         delay(3000);
       }
 
-    } else if (c == '2') { // daily boss
-      Serial.print("Input start index of boss (0 ~ ");
-      Serial.print(BOSS_COUNTS-1);
-      Serial.println(")");
-      Serial.println("Index map:\n0: Zakum, 1: Magnus, 2: Hilla, 3: Papulatus\n4: Pierre, 5: VonBon, 6: Queen, 7: Vellum\n8: VonLeon, 9: Horntail, 10: Arkarium, 11: PinkBean");
-      WaitInput();
-      int start = (int)Serial.read() - '0';
-      if (start < 0 || start >= BOSS_COUNTS) {
-        Serial.print("Invliad start boss index: ");
-        Serial.println(start);
-        return;
-      }
-      delay(3000);
-      for (int i = start; i < BOSS_COUNTS; i++) {
+    } else if (c == '2') {
+      for (int i = 0; i < BOSS_COUNTS; i++) {
         int index = BOSS_LIST[i];
         BossMoving(index);
         delay(2000);
@@ -147,33 +126,16 @@ void loop() {
       }
       
     } else if (c == '3') {
-      int test_index = 8;
-      BossMoving(test_index);
-      delay(2000);
-      Pierre();
+      WaitInput();
+      char next = Serial.read();
+      Serial.println(next);
       
-    } else if (c == '4') {
-      char command3[] = {'e', 'z', 'z', 'w'};
-      unsigned long minDelay3[] = {700, 500, 500, 1200};
-      unsigned long maxDelay3[] = {750, 520, 520, 1250};
-      int counts = 4;
-      Move(command3, counts, minDelay3, maxDelay3);
-      delay(1000);
-      SlightMove(false, 6);
-      
-      char command4[] = {'w', 'd', 'e'};
-      unsigned long wait4[] = {500, 500, 500};
-      counts = 3;
-      ArrowMove(command4, counts, wait4);
-      delay(1000);
-
-      // Boss
-      AbsoluteMouse.moveTo(CHAOS4_ACTIVATE_X, CHAOS4_ACTIVATE_Y);
-      delay(500);
-      AbsoluteMouse.click(MOUSE_LEFT);
-      delay(500);  
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
+
+    } else if (c == '9') {
+      Battle(WHEEL_CD, 0, false, false);
+      
     }
   }
 }
@@ -362,7 +324,7 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
   }
 }
 
-// ====================== Daily boss ======================
+// Daily boss
 void BossMoving(int index) {
   // Open UI
   Keyboard.write(BOSS);
@@ -411,42 +373,6 @@ void BossScript(int index) {
     Hilla();
     break;
 
-  case 7:
-    Papulatus(10);
-    break;
-    
-  case 8:
-    Pierre();
-    break;
-    
-  case 9:
-    VonBon();
-    break;
-    
-  case 10:
-    Queen();
-    break;
-    
-  case 11:
-    Vellum();
-    break;
-    
-  case 12:
-    VonLeon();
-    break;
-    
-  case 13:
-    Horntail();
-    break;
-    
-  case 14:
-    Arkarium();
-    break;
-    
-  case 17:
-    PinkBean();
-    break;
-    
   default:
     break;
   }
@@ -486,12 +412,12 @@ void ArrowMove(char direction[], int counts, unsigned long wait[]) {
   }
 }
 
-void Zakum(unsigned long period) { // period: second
+void Zakum(unsigned long period) {
   // Move
   // 1.1 Move to door
   char command1[] = {'d', 'd', 'd', 'd', 'd', 'd', 'd', 'z', 'z'};
-  unsigned long minDelay1[] = {550, 550, 550, 550, 550, 550, 550, 800, 445};
-  unsigned long maxDelay1[] = {551, 551, 551, 551, 551, 551, 551, 805, 450};
+  unsigned long minDelay1[] = {550, 550, 550, 550, 550, 550, 550, 445, 445};
+  unsigned long maxDelay1[] = {551, 551, 551, 551, 551, 551, 551, 450, 450};
   int counts = 9;
   Move(command1, counts, minDelay1, maxDelay1);
   delay(1000);
@@ -510,9 +436,9 @@ void Zakum(unsigned long period) { // period: second
   counts = 2;
   Move(command3, counts, minDelay3, maxDelay3);
 
-  char command4[] = {'y', 'y', 'y', 'y'};
-  unsigned long wait4[] = {700, 700, 700, 700};
-  counts = 4;
+  char command4[] = {'y', 'y'};
+  unsigned long wait4[] = {700, 700};
+  counts = 2;
   ArrowMove(command4, counts, wait4);
   delay(2500);
 
@@ -522,14 +448,18 @@ void Zakum(unsigned long period) { // period: second
   delay(500);
   Keyboard.write(ITEM);
   delay(500);
-  AbsoluteMouse.moveTo(LEFT_TOP_ITEM_X, LEFT_TOP_ITEM_Y);
+  AbsoluteMouse.moveTo(FLAME_EYE_X, FLAME_EYE_Y);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
-  AbsoluteMouse.moveTo(0, 0);
+  AbsoluteMouse.move(3000, 0);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
+  Keyboard.write('1');
+  delay(500);
+  Keyboard.write(ENTER);
+  delay(1000);
   Keyboard.write(ITEM);
   delay(500);
   
@@ -575,7 +505,7 @@ void Zakum(unsigned long period) { // period: second
   delay(3000);
 }
 
-void Magnus(unsigned long period) { // period: second
+void Magnus(unsigned long period) {
   // Move
   // 1.1 Move to door
   char command1[] = {'d', 'e', 'z', 'z'};
@@ -629,7 +559,7 @@ void Magnus(unsigned long period) { // period: second
   counts = 4;
   Move(command4, counts, minDelay4, maxDelay4);
   
-  AbsoluteMouse.moveTo(MAGNUS_OUT_SEAT_X, MAGNUS_OUT_SEAT_Y);
+  AbsoluteMouse.moveTo(-26500, 0);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
@@ -672,7 +602,7 @@ void Hilla() {
   // Level1
   SimpleSkill(true, FANTASY);
   delay(600);
-  WalkingSongSky(true, 60);
+  WalkingSongSky(60);
   delay(500);
   char command3[] = {'e', 'e', 'z', 'z', 'z'};
   unsigned long minDelay3[] = {700, 700, 200, 200, 200};
@@ -700,7 +630,7 @@ void Hilla() {
   // Level2
   SimpleSkill(true, FANTASY);
   delay(600);
-  WalkingSongSky(true, 60);
+  WalkingSongSky(60);
   delay(500);
   counts = 5;
   Move(command3, counts, minDelay3, maxDelay3);
@@ -721,7 +651,7 @@ void Hilla() {
   delay(2000);
 
   // Boss 
-  WalkingSongSky(true, 40);
+  WalkingSongSky(40);
   delay(500);
   char command5[] = {'e', 'e', 'q', 'q', 'q', 'q', 'q'};
   unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700, 700};
@@ -731,7 +661,7 @@ void Hilla() {
   delay(1000);
 
   // Back
-  AbsoluteMouse.moveTo(HILLA_OUT_SEAT_X, HILLA_OUT_SEAT_Y);
+  AbsoluteMouse.moveTo(-25500, -2000);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
@@ -755,248 +685,13 @@ void Hilla() {
   delay(2500);
 }
 
-void Papulatus(unsigned long period) { // period: second
-  // Move
-  // 1.1 Move to door
-  char command1[] = {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
-    'd', 'd', 'd', 'd', 'd', 'd', 'x', 'w'};
-  unsigned long minDelay1[] = {650, 650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650, 650, 650, 650, 300, 1200};
-  unsigned long maxDelay1[] = {700, 700, 700, 700, 700, 700,
-    700, 700, 700, 700, 700, 700, 700, 700, 320, 1250};
-  int counts = 16;
-  Move(command1, counts, minDelay1, maxDelay1);
-  delay(1000);
-
-  SlightMove(false, 6);
-
-  // 1.2 Go into door
-  char command2[] = {'w', 's', 'y', 'y', 'y'};
-  unsigned long wait2[] = {700, 700, 700, 700, 700};
-  counts = 5;
-  ArrowMove(command2, counts, wait2);
-  delay(2000);
-
-  // 1.3 Throw the item
-  char command3[] = {'d', 'd', 'd', 'd', 'w', 'z'};
-  unsigned long minDelay3[] = {650, 650, 650, 650, 1600, 300};
-  unsigned long maxDelay3[] = {700, 700, 700, 700, 1650, 320};
-  counts = 6;
-  Move(command3, counts, minDelay3, maxDelay3);
-  delay(1000);
-  SlightMove(true, 10);
-
-  Keyboard.write(ITEM);
-  delay(500);
-  AbsoluteMouse.moveTo(LEFT_TOP_ITEM_X, LEFT_TOP_ITEM_Y);
-  delay(500);
-  AbsoluteMouse.click(MOUSE_LEFT);
-  delay(500);
-  AbsoluteMouse.moveTo(0, 0);
-  delay(500);
-  AbsoluteMouse.click(MOUSE_LEFT);
-  delay(500);
-  Keyboard.write(ITEM);
-  delay(2000);
-
-  // Attack 
-  SlightMove(true, 10);
-  Tornado(false);
-  delay(random(800, 1000));
-  Swirl(false);
-  delay(random(800, 1000));
-  SimpleSkill(false, FANTASY);
-  delay(600);
-  SongOfTheSky(false, 5, 15, (period-1)*1000, (period+1)*1000);
-  delay(1000);
-
-  // Back
-  char command4[] = {'s', 'a', 'a', 'a'};
-  unsigned long minDelay4[] = {1000, 650, 650, 650};
-  unsigned long maxDelay4[] = {1100, 700, 700, 700};
-  counts = 4;
-  Move(command4, counts, minDelay4, maxDelay4);
-  delay(500);
-
-  char command5[] = {'y', 'd', 'e'};
-  unsigned long wait5[] = {700, 700, 700};
-  counts = 3;
-  ArrowMove(command5, counts, wait5);
-  delay(2000);
-  
-  char command6[] = {'a', 'x'};
-  unsigned long minDelay6[] = {700, 700};
-  unsigned long maxDelay6[] = {750, 750};
-  counts = 2;
-  Move(command6, counts, minDelay6, maxDelay6);
-  
-  SlightMove(true, 10);
-  delay(300);
-
-  char command7[] = {'w'};
-  unsigned long wait7[] = {1000};
-  counts = 1;
-  ArrowMove(command7, counts, wait7);
-  delay(3000);
+void WalkingSongSky(int times) {
+  for (int i = 0; i < times; i++) {
+    SongOfTheSky(true, 100, 105, 50, 55);
+  }
 }
 
-void Pierre() {
-    // Move
-  // 1.1 Move to door
-  char command1[] = {'a'};
-  unsigned long minDelay1[] = {650};
-  unsigned long maxDelay1[] = {670};
-  int counts = 1;
-  Move(command1, counts, minDelay1, maxDelay1);
-  delay(1000);
-
-  // 1.2 Go into door
-  char command2[] = {'y', 'y'};
-  unsigned long wait2[] = {700, 700};
-  counts = 2;
-  ArrowMove(command2, counts, wait2);
-  delay(1500);
-
-  // Level1
-  SimpleSkill(true, FANTASY);
-  delay(600);
-  WalkingSongSky(true, 80);
-  delay(500);
-  char command3[] = {'e', 'a'};
-  unsigned long minDelay3[] = {700, 700};
-  unsigned long maxDelay3[] = {750, 750};
-  counts = 2;
-  Move(command3, counts, minDelay3, maxDelay3);
-  delay(1000);
-  SlightMove(true, 15);
-
-  char command4[] = {'w', 'd', 'e'};
-  unsigned long wait4[] = {500, 500, 500};
-  counts = 3;
-  ArrowMove(command4, counts, wait4);
-  delay(1000);
-
-  // Boss
-  SimpleSkill(true, FANTASY);
-  delay(600);
-  SongOfTheSky(true, 10, 15, 5000, 5500);
-  delay(2000);
-  SimpleSkill(true, ATTACK);
-  delay(2000);
-
-  // Back
-  char command5[] = {'e', 'e', 'q', 'q', 'q', 'q'};
-  unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700};
-  unsigned long maxDelay5[] = {730, 730, 730, 730, 730, 730};
-  counts = 6;
-  Move(command5, counts, minDelay5, maxDelay5);
-  delay(1000);
-
-  AbsoluteMouse.moveTo(CHAOS4_OUT_X, CHAOS4_OUT_Y);
-  delay(500);
-  AbsoluteMouse.click(MOUSE_LEFT);
-  delay(500);
-  char command6[] = {'d', 'e'};
-  unsigned long wait6[] = {700, 700};
-  counts = 2;
-  ArrowMove(command6, counts, wait6);
-  delay(2500);
-}
-
-void VonBon() {
-  // Move
-  // 1.1 Move to door
-  char command1[] = {'d'};
-  unsigned long minDelay1[] = {650};
-  unsigned long maxDelay1[] = {670};
-  int counts = 1;
-  Move(command1, counts, minDelay1, maxDelay1);
-  delay(1000);
-
-  // 1.2 Go into door
-  char command2[] = {'y', 'y'};
-  unsigned long wait2[] = {700, 700};
-  counts = 2;
-  ArrowMove(command2, counts, wait2);
-  delay(1500);
-
-  // Level1
-  SimpleSkill(true, FANTASY);
-  delay(600);
-  WalkingSongSky(true, 80);
-  delay(500);
-  
-  char command3[] = {'e', 'z', 'z', 'w'};
-  unsigned long minDelay3[] = {700, 500, 500, 1200};
-  unsigned long maxDelay3[] = {750, 520, 520, 1250};
-  counts = 4;
-  Move(command3, counts, minDelay3, maxDelay3);
-  delay(1000);
-  SlightMove(false, 6);
-      
-  char command4[] = {'w', 'd', 'e'};
-  unsigned long wait4[] = {500, 500, 500};
-  counts = 3;
-  ArrowMove(command4, counts, wait4);
-  delay(1000);
-
-  // Boss
-  AbsoluteMouse.moveTo(CHAOS4_ACTIVATE_X, CHAOS4_ACTIVATE_Y);
-  delay(500);
-  AbsoluteMouse.click(MOUSE_LEFT);
-  delay(500);  
-  
-  // SimpleSkill(true, FANTASY);
-  // delay(600);
-  // SongOfTheSky(true, 10, 15, 5000, 5500);
-  // delay(1000);
-  // SimpleSkill(true, ATTACK);
-  // delay(2000);
-
-  // Back
-  char command5[] = {'e', 'e', 'q', 'q', 'q', 'q'};
-  unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700};
-  unsigned long maxDelay5[] = {730, 730, 730, 730, 730, 730};
-  counts = 6;
-  Move(command5, counts, minDelay5, maxDelay5);
-  delay(1000);
-
-  AbsoluteMouse.moveTo(CHAOS4_OUT_X, CHAOS4_OUT_Y);
-  delay(500);
-  AbsoluteMouse.click(MOUSE_LEFT);
-  delay(500);
-  char command6[] = {'d', 'e'};
-  unsigned long wait6[] = {700, 700};
-  counts = 2;
-  ArrowMove(command6, counts, wait6);
-  delay(2500);
-}
-
-void Queen() {
-
-}
-
-void Vellum() {
-
-} 
-
-void VonLeon() {
-
-}
-
-void Horntail() {
-
-}
-
-void Arkarium() {
-
-}
-
-void PinkBean() {
-
-}
-
-// ====================== Daily task ======================
+// Daily task
 void GuideMoving(int index) {
   // Open UI
   Keyboard.write(GUIDE);
@@ -1057,14 +752,6 @@ void Turn(bool direction) {
   delay(30);
   Keyboard.releaseAll();
   delay(100);
-}
-
-void SlightMove(bool direction, int times) {
-  for (int i = 0; i < times; i++) {
-    Turn(direction);
-    delay(100);
-  }
-  delay(300);
 }
 
 // minUp maxUp will affect the height of UpJump
@@ -1150,12 +837,6 @@ unsigned long SongOfTheSky(bool direction, unsigned long minWalk, unsigned long 
   delay(random(minDuration, maxDuration));
   Keyboard.releaseAll();
   return distance;
-}
-
-void WalkingSongSky(bool direction, int times) {
-  for (int i = 0; i < times; i++) {
-    SongOfTheSky(direction, 100, 105, 50, 55);
-  }
 }
 
 void Fountain(bool direction) {
