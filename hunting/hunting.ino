@@ -41,20 +41,13 @@ const long CHAOS4_ACTIVATE_Y = 0;
  * 17 = 皮卡啾
  * */ 
 
-const char GUIDE = 'u';
-const long GUIDE_FIRST_X = -30000;
-const long GUIDE_FIRST_Y = -2000;
-const long GUIDE_DISTANCE_X = 1650;
-const long MOVE_BOUnD_MAX = 32767;
-const long MOVE_BOUND_MIN = -32767;
-
 const unsigned long WHEEL_CD = 630;
 const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
 const char SONG_SKY = 'a';
 const char ROPE = 't';
-const char ATTACK = 't';
+const char ATTACK = '0'; // KEYBOARD_DELETE
 
 const char FOUNTAIN = 'z';
 const unsigned long FOUNTAIN_CD = 58; 
@@ -88,43 +81,11 @@ void loop() {
     // Start with a command character
     delay(3000);
     char c = (char)Serial.read();
-    if (c == '1') { // daily task
-      Serial.println("Input 'a' for 6 tasks, 'b' for 9 tasks");
-      WaitInput();
-      char next = Serial.read();
-      unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70, 150, 150, 150};
-      int GUIDE_DAILY_TASKS = 9; // daily
-
-      if (next == 'a') {
-        BATTLE_TIME[4] = 100;
-        BATTLE_TIME[5] = 200;
-        GUIDE_DAILY_TASKS = 6;
-        Serial.println("Input start task (0 ~ 5)");
-
-      } else if (next == 'b') {
-        Serial.println("Input start task (0 ~ 8)");
-
-      } else {
-        Serial.print("Invalid command: ");
-        Serial.println(next);
-        return;
-      }
-      WaitInput();
-      int start = (int)Serial.read() - '0';
-      if (start < 0 || start >= GUIDE_DAILY_TASKS) {
-        Serial.print("Invliad start task number: ");
-        Serial.println(start);
-        return;
-      }
-      delay(3000);
-      
-      for (int i = start; i < GUIDE_DAILY_TASKS; i++) { // daily
-        GuideMoving(i+1);
-        delay(500);
-        Battle(BATTLE_TIME[i], i+1, false, false);
-        delay(3000);
-      }
-
+    if (c == 't') { // stand for testing
+      int test_index = 8;
+      BossMoving(test_index);
+      delay(2000);
+      Pierre();
     } else if (c == '2') { // daily boss
       Serial.print("Input start index of boss (0 ~ ");
       Serial.print(BOSS_COUNTS-1);
@@ -145,220 +106,7 @@ void loop() {
         BossScript(index);
         delay(3000);
       }
-      
-    } else if (c == '3') {
-      int test_index = 8;
-      BossMoving(test_index);
-      delay(2000);
-      Pierre();
-      
-    } else if (c == '4') {
-      char command3[] = {'e', 'z', 'z', 'w'};
-      unsigned long minDelay3[] = {700, 500, 500, 1200};
-      unsigned long maxDelay3[] = {750, 520, 520, 1250};
-      int counts = 4;
-      Move(command3, counts, minDelay3, maxDelay3);
-      delay(1000);
-      SlightMove(false, 6);
-      
-      char command4[] = {'w', 'd', 'e'};
-      unsigned long wait4[] = {500, 500, 500};
-      counts = 3;
-      ArrowMove(command4, counts, wait4);
-      delay(1000);
-
-      // Boss
-      AbsoluteMouse.moveTo(CHAOS4_ACTIVATE_X, CHAOS4_ACTIVATE_Y);
-      delay(500);
-      AbsoluteMouse.click(MOUSE_LEFT);
-      delay(500);  
-    } else if (c == '0') {
-      Battle(WHEEL_CD, 0, true, true);
     }
-  }
-}
-
-void Battle(unsigned long period, int preMove, bool useFountain, bool collectMoney) {
-  if (preMove == 1) {
-    char toCenterCommand[] = {'d', 'd', 'd'};
-    unsigned long minDelay[] = {600, 600, 600};
-    unsigned long maxDelay[] = {650, 650, 650};
-    Move(toCenterCommand, 3, minDelay, maxDelay);
-
-  } else if (preMove == 2) {
-    char toCenterCommand[] = {'d', 'd', 'd', 'd'};
-    unsigned long minDelay[] = {600, 600, 600, 600};
-    unsigned long maxDelay[] = {650, 650, 650, 650};
-    Move(toCenterCommand, 4, minDelay, maxDelay);
-
-  } else if (preMove == 3) {
-    char toCenterCommand[] = {'e', 'd', 'd'};
-    unsigned long minDelay[] = {1500, 600, 600};
-    unsigned long maxDelay[] = {1600, 650, 650};
-    Move(toCenterCommand, 3, minDelay, maxDelay);
-
-  } else if (preMove == 4) {
-    char toCenterCommand[] = {'s', 's', 's'};
-    unsigned long minDelay[] = {600, 600, 600};
-    unsigned long maxDelay[] = {650, 650, 650};
-    Move(toCenterCommand, 3, minDelay, maxDelay);
-
-  } else if (preMove == 5) {
-    char toCenterCommand[] = {'q', 'q', 'q', 'x', 'x', 'x', 'w', 's'};
-    unsigned long minDelay[] = {1300, 1100, 1100, 300, 300, 300, 1200, 600};
-    unsigned long maxDelay[] = {1400, 1200, 1200, 350, 350, 350, 1250, 650};
-    Move(toCenterCommand, 8, minDelay, maxDelay);
-
-  } else if (preMove == 6) {
-    char toCenterCommand[] = {'d', 'w', 's', 'z', 'z'};
-    unsigned long minDelay[] = {600, 1000, 600, 300, 300};
-    unsigned long maxDelay[] = {650, 1200, 650, 350, 350};
-    Move(toCenterCommand, 5, minDelay, maxDelay);
-
-  } else if (preMove == 7) {
-
-  } else if (preMove == 8) {
-    char toCenterCommand[] = {'q', 's', 's'};
-    unsigned long minDelay[] = {1200, 600, 600};
-    unsigned long maxDelay[] = {1300, 650, 650};
-    Move(toCenterCommand, 3, minDelay, maxDelay);
-
-  } else if (preMove == 9) {
-    char toCenterCommand[] = {'z', 'z', 'z', 'w', 's'};
-    unsigned long minDelay[] = {300, 300, 300, 1500, 800};
-    unsigned long maxDelay[] = {350, 350, 350, 1600, 850};
-    Move(toCenterCommand, 5, minDelay, maxDelay);
-    collectMoney = true;
-  }
-  delay(800);
-
-  bool direction = false;
-  unsigned long start = millis();
-  unsigned long TornadoStart = start;
-  unsigned long SwirlStart = start;
-  unsigned long MonsoonStart = start;
-  unsigned long FantasyStart = start;
-  unsigned long FountainStart = start;
-  unsigned long BirdStart = start;
-  unsigned long MoneyStart = start;
-
-  unsigned long buffStart[5] = {start, start, start, start, start};
-
-  unsigned long time = millis();
-  int second = (time-start)/1000;
-  bool startUp = true;
-  while (second < period) {
-    bool underAttack = false;
-    SongOfTheSky(direction, 10, 20, 500, 1000);
-    direction = !direction;
-    
-    // Fantasy
-    if (startUp || (time-FantasyStart)/1000 > FANTASY_CD) {
-      SimpleSkill(direction, FANTASY);
-      FantasyStart = millis();
-      delay(600);
-      Serial.print(second);
-      Serial.println("Fantasy");
-    }
-        
-    // Tornado
-    time = millis();
-    second = (time-start)/1000;
-    if (startUp || (time-TornadoStart)/1000 > TORNADO_CD) {
-      Tornado(direction);
-      TornadoStart = millis();
-      delay(random(700, 1000));
-      
-      Serial.print(second);
-      Serial.println("Tornado");
-      underAttack = true;
-    }
-
-    // Swirl
-    time = millis();
-    second = (time-start)/1000;
-    if (startUp || (time-SwirlStart)/1000 > SWIRL_CD) {
-      Swirl(direction);
-      SwirlStart = millis();
-      delay(random(800, 1000));
-      
-      Serial.print(second);
-      Serial.println("Swirl");
-    }
-
-    // Bird
-    time = millis();
-    second = (time-start)/1000;
-    if (startUp || (time-BirdStart)/1000 > BIRD_CD) {
-      SimpleSkill(direction, BIRD);
-      BirdStart = millis();
-      delay(random(800, 1000));
-        
-      Serial.print(second);
-      Serial.println("Bird");
-    }
-
-    // Monsoon
-    time = millis();
-    second = (time-start)/1000;
-    if (startUp || (time-MonsoonStart)/1000 > MONSOON_CD) {
-      SimpleSkill(direction, MONSOON);
-      MonsoonStart = millis();
-      delay(random(1500, 1700));
-      
-      Serial.print(second);
-      Serial.println("Monsoon");
-    }
-
-    // Buffs
-    for (int i = 0; i < BUFF_COUNTS; i++) {
-      time = millis();
-      second = (time-start)/1000;
-      if (startUp || (time-buffStart[i])/1000 > BUFF_CD[i]) {
-        SimpleSkill(direction, BUFF[i]);
-        buffStart[i] = millis();
-        delay(random(800, 1000));
-      
-        Serial.print(second);
-        Serial.println(BUFF_NAME[i]);
-      }
-    }
-
-    // Fountain
-    time = millis();
-    second = (time-start)/1000;
-    if (useFountain && (startUp || (time-FountainStart)/1000 > FOUNTAIN_CD)) {
-      // Move to the specific position
-      // MoveToFountain_2_6();
-      MoveToFountain_library4();
-      
-      // Fountain
-      Fountain(false);
-      FountainStart = millis();
-      delay(random(800, 1000));
-
-      Serial.print(second);
-      Serial.println("Fountain");
-         
-      // Move back to origin position
-      // BackFromFountain_2_6();
-      BackFromFountain_library4();
-    }
-
-    // Money
-    time = millis();
-    second = (time-start)/1000;
-    if (startUp || (underAttack && (time-MoneyStart)/1000 > MONEY_CD)) {
-      if (collectMoney) {
-      // Collect money
-      // CollectMoney_2_6();
-      // CollectMoney_library4();
-      CollectMoney_alley2();
-      }
-      MoneyStart = millis();
-    }
-    delay(random(50, 100));
-    startUp = false;
   }
 }
 
@@ -996,26 +744,7 @@ void PinkBean() {
 
 }
 
-// ====================== Daily task ======================
-void GuideMoving(int index) {
-  // Open UI
-  Keyboard.write(GUIDE);
-  delay(1000);
-  // Move mouse to the first location
-  AbsoluteMouse.moveTo(GUIDE_FIRST_X, GUIDE_FIRST_Y);
-  delay(1000);
-  
-  // Move right according to the index value
-  for (int i = 0; i < index; i++) {
-    AbsoluteMouse.move(GUIDE_DISTANCE_X, 0);
-    delay(200);
-  }
-
-  // Move and wait
-  AbsoluteMouse.click(MOUSE_LEFT);
-  delay(2000);
-}
-
+// ====================== Commands ======================
 void DoubleJumpAttackA(bool direction, char jump, char attack) {
   if (direction == true) {
     Keyboard.press(KEY_RIGHT_ARROW);
@@ -1236,134 +965,7 @@ void Move(char direction[], int counts, unsigned long minDelay[], unsigned long 
     delay(random(minDelay[i], maxDelay[i]));
   }
 }
-/************** Library 4 ***************/
-void MoveToFountain_library4() {
-  unsigned long rand = random(1);
-  if (rand == 0) {
-    MoveToFountainA_library4();
-  } else if (rand == 1) {
 
-  } else if (rand == 2) {
-
-  } else if (rand == 3) {
-
-  }
-}
-
-void MoveToFountainA_library4() {
-  char commands[] = {'e', 'd'};
-  unsigned long minDelay[] = {400, 750};
-  unsigned long maxDelay[] = {410, 850};
-  Move(commands, 2, minDelay, maxDelay);
-}
-
-void BackFromFountain_library4() {
-  char commands[] = {'q', 'a'};
-  unsigned long minDelay[] = {400, 900};
-  unsigned long maxDelay[] = {410, 1000};
-  Move(commands, 2, minDelay, maxDelay);
-}
-
-void CollectMoney_alley2() {
-  MoveToFountainA_library4();
-  delay(800);
-  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'd', 'e', 'e'};
-  unsigned long minDelay[] = {900, 580, 580, 580, 580, 580, 580, 580, 700, 700, 1000, 650, 650};
-  unsigned long maxDelay[] = {1000, 600, 600, 600, 600, 600, 600, 600, 800, 800, 1100, 700, 700};
-  Move(commands, 13, minDelay, maxDelay);
-}
-
-void CollectMoney_library4() {
-  MoveToFountainA_library4();
-  delay(800);
-  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'd', 'e', 'd'};
-  unsigned long minDelay[] = {900, 580, 580, 580, 580, 580, 580, 580, 700, 700, 1000, 400, 900};
-  unsigned long maxDelay[] = {1000, 600, 600, 600, 600, 600, 600, 600, 800, 800, 1100, 450, 1000};
-  Move(commands, 13, minDelay, maxDelay);
-}
-
-/************** 2-6 ***************/
-void MoveToFountain_2_6() {
-  unsigned long rand = random(4);
-  if (rand == 0) {
-    MoveToFountainA_2_6();
-  } else if (rand == 1) {
-    MoveToFountainB_2_6();
-  } else if (rand == 2) {
-    MoveToFountainC_2_6();
-  } else if (rand == 3) {
-    MoveToFountainD_2_6();
-  }
-}
-
-void BackFromFountain_2_6() {
-  unsigned long rand = random(2);
-  if (rand == 0) {
-    BackFromFountainA_2_6();
-  } else if (rand == 1) {
-    BackFromFountainB_2_6();
-  } 
-}
-
-void MoveToFountainA_2_6() {
-  char commands[] = {'a', 'a', 'w', 'r'};
-  unsigned long minDelay[] = {550, 650, 900, 50};
-  unsigned long maxDelay[] = {650, 750, 1000, 80};
-  Move(commands, 4, minDelay, maxDelay);
-}
-
-void MoveToFountainB_2_6() {
-  char commands[] = {'w', 'a', 'a', 'r'};
-  unsigned long minDelay[] = {700, 550, 550, 250};
-  unsigned long maxDelay[] = {750, 600, 600, 280};
-  Move(commands, 4, minDelay, maxDelay);
-}
-
-void MoveToFountainC_2_6() {
-  char commands[] = {'a', 'w', 'a', 'r'};
-  unsigned long minDelay[] = {550, 700, 550, 250};
-  unsigned long maxDelay[] = {600, 750, 600, 280};
-  Move(commands, 4, minDelay, maxDelay);
-}
-
-void MoveToFountainD_2_6() {
-  char commands[] = {'q', 'w', 'r'};
-  unsigned long minDelay[] = {700, 400, 1000};
-  unsigned long maxDelay[] = {750, 500, 1200};
-  Move(commands, 3, minDelay, maxDelay);
-}
-
-void BackFromFountainA_2_6() {
-  char commands[] = {'e', 'd'};
-  unsigned long minDelay[] = {350, 1000};
-  unsigned long maxDelay[] = {450, 1200};
-  Move(commands, 2, minDelay, maxDelay);
-}
-
-void BackFromFountainB_2_6() {
-  char commands[] = {'s', 'd', 'd'};
-  unsigned long minDelay[] = {1100, 550, 700};
-  unsigned long maxDelay[] = {1200, 600, 800};
-  Move(commands, 3, minDelay, maxDelay);
-}
-
-void CollectMoney_2_6() {
-  unsigned long rand = random(1);
-  if (rand == 0) {
-    CollectMoneyA_2_6();
-  } else if (rand == 1) {
-
-  }
-}
-
-void CollectMoneyA_2_6() {
-  char commands[] = {'d', 'd', 'w', 'l', 'q', 'a'};
-  unsigned long minDelay[] = {550, 550, 900, 200, 350, 1000};
-  unsigned long maxDelay[] = {650, 650, 1000, 250, 450, 1200};
-  Move(commands, 6, minDelay, maxDelay);
-}
-
-/**********************************/
 void WaitInput() {
   for (;Serial.available() <= 0;) {
     // Waiting input
