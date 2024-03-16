@@ -85,7 +85,8 @@ void loop() {
       int test_index = 8;
       BossMoving(test_index);
       delay(2000);
-      Pierre();
+      VonBon();
+
     } else if (c == '2') { // daily boss
       Serial.print("Input start index of boss (0 ~ ");
       Serial.print(BOSS_COUNTS-1);
@@ -695,11 +696,11 @@ void VonBon() {
   delay(500);  
   
   // SimpleSkill(true, FANTASY);
-  // delay(600);
-  // SongOfTheSky(true, 10, 15, 5000, 5500);
-  // delay(1000);
-  // SimpleSkill(true, ATTACK);
-  // delay(2000);
+  delay(600);
+  SongOfTheSky(true, 10, 15, 5000, 5500);
+  delay(1000);
+  SimpleSkill(true, ATTACK);
+  delay(2000);
 
   // Back
   char command5[] = {'e', 'e', 'q', 'q', 'q', 'q'};
@@ -709,7 +710,7 @@ void VonBon() {
   Move(command5, counts, minDelay5, maxDelay5);
   delay(1000);
 
-  AbsoluteMouse.moveTo(CHAOS4_OUT_X, CHAOS4_OUT_Y);
+  AbsoluteMouse.moveTo(CHAOS4_OUT_X, 0);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
