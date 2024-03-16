@@ -18,7 +18,7 @@ const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
 const int BOSS_COUNTS = 12;
-const int BOSS_LIST[BOSS_COUNTS] = {2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 17};
+const int BOSS_LIST[BOSS_COUNTS] = {7, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 17};
 const long LEFT_TOP_ITEM_X = -31500;
 const long LEFT_TOP_ITEM_Y = -28000;
 const long MAGNUS_OUT_SEAT_X = -26500;
@@ -30,10 +30,10 @@ const long CHAOS4_OUT_Y = -2000;
 const long CHAOS4_ACTIVATE_X = 0;
 const long CHAOS4_ACTIVATE_Y = 0;
 /**
+ * 7 = 拉圖斯
  * 2 = 炎魔
  * 3 = 暴君
  * 4 = 希拉
- * 7 = 拉圖斯
  * 8 ~ 11 = 混4
  * 12 = 凡雷恩
  * 13 = 龍王
@@ -91,7 +91,7 @@ void loop() {
       Serial.print("Input start index of boss (0 ~ ");
       Serial.print(BOSS_COUNTS-1);
       Serial.println(")");
-      Serial.println("Index map:\n0: Zakum, 1: Magnus, 2: Hilla, 3: Papulatus\n4: Pierre, 5: VonBon, 6: Queen, 7: Vellum\n8: VonLeon, 9: Horntail, 10: Arkarium, 11: PinkBean");
+      Serial.println("Index map:\n0: Papulatus, 1: Zakum, 2: Magnus, 3: Hilla\n4: Pierre, 5: VonBon, 6: Queen, 7: Vellum\n8: VonLeon, 9: Horntail, 10: Arkarium, 11: PinkBean");
       WaitInput();
       int start = (int)Serial.read() - '0';
       if (start < 0 || start >= BOSS_COUNTS) {
@@ -102,6 +102,8 @@ void loop() {
       delay(3000);
       for (int i = start; i < BOSS_COUNTS; i++) {
         int index = BOSS_LIST[i];
+        Serial.print("Now is at index: ");
+        Serial.println(i);
         BossMoving(index);
         delay(2000);
         BossScript(index);
@@ -372,10 +374,10 @@ void Magnus(unsigned long period) { // period: second
   }
 
   // Back
-  char command4[] = {'e', 'q', 'q', 'q'};
-  unsigned long minDelay4[] = {800, 700, 700, 700};
-  unsigned long maxDelay4[] = {850, 750, 750, 750};
-  counts = 4;
+  char command4[] = {'e', 'e', 'q', 'q', 'q', 'q'};
+  unsigned long minDelay4[] = {800, 800, 700, 700, 700, 700};
+  unsigned long maxDelay4[] = {850, 850, 750, 750, 750, 750};
+  counts = 6;
   Move(command4, counts, minDelay4, maxDelay4);
   
   AbsoluteMouse.moveTo(MAGNUS_OUT_SEAT_X, MAGNUS_OUT_SEAT_Y);
@@ -533,7 +535,7 @@ void Papulatus(unsigned long period) { // period: second
   counts = 6;
   Move(command3, counts, minDelay3, maxDelay3);
   delay(1000);
-  SlightMove(true, 10);
+  SlightMove(true, 5);
 
   Keyboard.write(ITEM);
   delay(500);
@@ -840,7 +842,7 @@ void Vellum() {
   SongOfTheSky(true, 10, 15, 6000, 6500);
   delay(1000);
   SimpleSkill(true, ATTACK);
-  delay(2000);
+  delay(3000);
 
   // Back
   char command5[] = {'e', 'e', 'q', 'q', 'q', 'q'};
