@@ -82,10 +82,10 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == 't') { // stand for testing
-      int test_index = 8;
+      int test_index = 10;
       BossMoving(test_index);
       delay(2000);
-      VonBon();
+      Queen();
 
     } else if (c == '2') { // daily boss
       Serial.print("Input start index of boss (0 ~ ");
@@ -722,7 +722,74 @@ void VonBon() {
 }
 
 void Queen() {
+  // Move
+  // 1.1 Move to door
+  char command1[] = {'a', 'a'};
+  unsigned long minDelay1[] = {650, 650};
+  unsigned long maxDelay1[] = {670, 670};
+  int counts = 2;
+  Move(command1, counts, minDelay1, maxDelay1);
+  delay(1000);
 
+  // 1.2 Go into door
+  char command2[] = {'y', 'y'};
+  unsigned long wait2[] = {700, 700};
+  counts = 2;
+  ArrowMove(command2, counts, wait2);
+  delay(1500);
+
+  // Level1
+  SimpleSkill(true, FANTASY);
+  delay(600);
+  WalkingSongSky(true, 80);
+  delay(500);
+  
+  char command3[] = {'e', 'e', 'a', 'a', 'x'};
+  unsigned long minDelay3[] = {700, 700, 700, 700, 500};
+  unsigned long maxDelay3[] = {710, 710, 710, 710, 520};
+  counts = 5;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(1000);
+  SlightMove(true, 10);
+      
+  char command4[] = {'w', 'd', 'e'};
+  unsigned long wait4[] = {500, 500, 500};
+  counts = 3;
+  ArrowMove(command4, counts, wait4);
+  delay(1000);
+
+  // Boss
+  AbsoluteMouse.moveTo(CHAOS4_ACTIVATE_X, CHAOS4_ACTIVATE_Y);
+  delay(500);
+  for (int i = 0; i < 10; i++) {
+    AbsoluteMouse.click(MOUSE_LEFT);
+    delay(200);  
+  }
+  
+  SimpleSkill(true, FANTASY);
+  delay(600);
+  SongOfTheSky(true, 10, 15, 5000, 5500);
+  delay(1000);
+  SimpleSkill(true, ATTACK);
+  delay(2000);
+
+  // Back
+  char command5[] = {'e', 'e', 'q', 'q', 'q', 'q'};
+  unsigned long minDelay5[] = {700, 700, 700, 700, 700, 700};
+  unsigned long maxDelay5[] = {730, 730, 730, 730, 730, 730};
+  counts = 6;
+  Move(command5, counts, minDelay5, maxDelay5);
+  delay(1000);
+
+  AbsoluteMouse.moveTo(CHAOS4_OUT_X, 0);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  char command6[] = {'d', 'e'};
+  unsigned long wait6[] = {700, 700};
+  counts = 2;
+  ArrowMove(command6, counts, wait6);
+  delay(2500);
 }
 
 void Vellum() {
