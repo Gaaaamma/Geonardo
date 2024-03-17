@@ -84,10 +84,10 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == 't') { // stand for testing
-      int test_index = 13;
+      int test_index = 14;
       BossMoving(test_index);
       delay(2000);
-      Horntail();
+      Arkarium();
 
     } else if (c == '2') { // daily boss
       Serial.print("Input start index of boss (0 ~ ");
@@ -1058,7 +1058,76 @@ void Horntail() {
 }
 
 void Arkarium() {
+  // Move
+  // 1.1 Move to door
+  char command1[] = {'d', 'd', 'd', 'x'};
+  unsigned long minDelay1[] = {650, 650, 650, 300};
+  unsigned long maxDelay1[] = {655, 655, 655, 310};
+  int counts = 4;
+  Move(command1, counts, minDelay1, maxDelay1);
+  delay(300);
+  SlightMove(true, 6);
+  delay(500);
 
+  // 1.2 Go into door
+  char command2[] = {'w', 'y', 's', 'y'};
+  unsigned long wait2[] = {700, 700, 700, 700};
+  counts = 4;
+  ArrowMove(command2, counts, wait2);
+  delay(1500);
+
+  // Boss
+  char command3[] = {'d', 'd', 'd'};
+  unsigned long minDelay3[] = {700, 700, 700};
+  unsigned long maxDelay3[] = {710, 710, 710};
+  counts = 3;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(500);
+      
+  char command4[] = {'y', 'd', 'e'};
+  unsigned long wait4[] = {500, 500, 500};
+  counts = 3;
+  ArrowMove(command4, counts, wait4);
+  delay(1000);
+
+  // Boss
+  SimpleSkill(true, FANTASY);
+  delay(700);
+  SongOfTheSky(true, true, 10, 15, 4000, 4200);
+  delay(1000);
+  SimpleSkill(true, ATTACK);
+  delay(2000);
+
+  // Back
+  char command5[] = {'q', 'q', 'q'};
+  unsigned long minDelay5[] = {700, 700, 700};
+  unsigned long maxDelay5[] = {730, 730, 730};
+  counts = 3;
+  Move(command5, counts, minDelay5, maxDelay5);
+  delay(1000);
+
+  AbsoluteMouse.moveTo(CHAOS4_OUT_X, 0);
+  delay(500);
+  AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  char command6[] = {'d', 'e'};
+  unsigned long wait6[] = {700, 700};
+  counts = 2;
+  ArrowMove(command6, counts, wait6);
+  delay(2000);
+
+  char command7[] = {'z'};
+  unsigned long minDelay7[] = {700};
+  unsigned long maxDelay7[] = {730};
+  counts = 1;
+  Move(command7, counts, minDelay7, maxDelay7);
+  delay(500);
+
+  char command8[] = {'w'};
+  unsigned long wait8[] = {700};
+  counts = 1;
+  ArrowMove(command8, counts, wait8);
+  delay(2500);
 }
 
 void PinkBean() {
