@@ -48,7 +48,7 @@ const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
 const char SONG_SKY = 'a';
-const char ROPE = 't';
+const char ROPE = '9';
 const char ATTACK = '0'; // KEYBOARD_DELETE
 
 const char FOUNTAIN = 'z';
@@ -84,10 +84,10 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == 't') { // stand for testing
-      int test_index = 12;
+      int test_index = 13;
       BossMoving(test_index);
       delay(2000);
-      VonLeon();
+      Horntail();
 
     } else if (c == '2') { // daily boss
       Serial.print("Input start index of boss (0 ~ ");
@@ -300,7 +300,7 @@ void Zakum(unsigned long period) { // period: second
   SimpleSkill(direction, FANTASY);
   delay(600);
   while (second < period) {
-    SongOfTheSky(direction, 10, 15, 500, 1000);
+    SongOfTheSky(true, direction, 10, 15, 500, 1000);
     direction = !direction;
     second = (millis() - start) / 1000;
   }
@@ -374,7 +374,7 @@ void Magnus(unsigned long period) { // period: second
   SimpleSkill(direction, FANTASY);
   delay(600);
   while (second < period) {
-    SongOfTheSky(direction, 10, 15, 500, 1000);
+    SongOfTheSky(true, direction, 10, 15, 500, 1000);
     direction = !direction;
     second = (millis() - start) / 1000;
   }
@@ -447,7 +447,7 @@ void Hilla() {
   ArrowMove(command4, counts, wait4);
   delay(300);
   Turn(false);
-  SongOfTheSky(false, 5, 10, 2500, 2600);
+  SongOfTheSky(true, false, 5, 10, 2500, 2600);
   delay(500);
   Turn(true);
   Turn(true);
@@ -470,7 +470,7 @@ void Hilla() {
   ArrowMove(command4, counts, wait4);
   delay(300);
   Turn(false);
-  SongOfTheSky(false, 5, 10, 2500, 2600);
+  SongOfTheSky(true, false, 5, 10, 2500, 2600);
   delay(500);
   Turn(true);
   Turn(true);
@@ -564,7 +564,7 @@ void Papulatus(unsigned long period) { // period: second
   delay(random(800, 1000));
   SimpleSkill(false, FANTASY);
   delay(600);
-  SongOfTheSky(false, 5, 15, (period-1)*1000, (period+1)*1000);
+  SongOfTheSky(true, false, 5, 15, (period-1)*1000, (period+1)*1000);
   delay(1000);
 
   // Back
@@ -636,7 +636,7 @@ void Pierre() {
   // Boss
   SimpleSkill(true, FANTASY);
   delay(600);
-  SongOfTheSky(true, 10, 15, 5000, 5500);
+  SongOfTheSky(true, true, 10, 15, 5000, 5500);
   delay(2000);
   SimpleSkill(true, ATTACK);
   delay(2000);
@@ -705,7 +705,7 @@ void VonBon() {
   
   // SimpleSkill(true, FANTASY);
   delay(600);
-  SongOfTheSky(true, 10, 15, 5000, 5500);
+  SongOfTheSky(true, true, 10, 15, 5000, 5500);
   delay(1000);
   SimpleSkill(true, ATTACK);
   delay(2000);
@@ -776,7 +776,7 @@ void Queen() {
   
   SimpleSkill(true, FANTASY);
   delay(600);
-  SongOfTheSky(true, 10, 15, 5000, 5500);
+  SongOfTheSky(true, true, 10, 15, 5000, 5500);
   delay(1000);
   SimpleSkill(true, ATTACK);
   delay(2000);
@@ -845,7 +845,7 @@ void Vellum() {
   
   SimpleSkill(true, FANTASY);
   delay(600);
-  SongOfTheSky(true, 10, 15, 6000, 6500);
+  SongOfTheSky(true, true, 10, 15, 6000, 6500);
   delay(1000);
   SimpleSkill(true, ATTACK);
   delay(3000);
@@ -905,7 +905,7 @@ void VonLeon() {
   // Boss
   SimpleSkill(true, FANTASY);
   delay(600);
-  SongOfTheSky(true, 10, 15, 7000, 7500);
+  SongOfTheSky(true, true, 10, 15, 7000, 7500);
   delay(1000);
   SimpleSkill(true, ATTACK);
   delay(2000);
@@ -943,7 +943,118 @@ void VonLeon() {
 }
 
 void Horntail() {
+  // Move
+  // 1.1 Move to door
+  char command1[] = {'e', 's', 's', 's'};
+  unsigned long minDelay1[] = {700, 650, 650, 650};
+  unsigned long maxDelay1[] = {710, 655, 655, 655};
+  int counts = 4;
+  Move(command1, counts, minDelay1, maxDelay1);
+  delay(800);
 
+  // 1.2 Go into door
+  char command2[] = {'y'};
+  unsigned long wait2[] = {700};
+  counts = 1;
+  ArrowMove(command2, counts, wait2);
+  delay(2000);
+
+  char command3[] = {'d', 'd', 'd'};
+  unsigned long minDelay3[] = {700, 700, 700};
+  unsigned long maxDelay3[] = {710, 710, 710};
+  counts = 3;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(500);
+
+  char command4[] = {'y', 'd', 'e'};
+  unsigned long wait4[] = {500, 500, 500};
+  counts = 3;
+  ArrowMove(command4, counts, wait4);
+  delay(1000);
+
+  counts = 3;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(500);
+
+  char command5[] = {'y', 'y', 's', 's', 'e'};
+  unsigned long wait5[] = {500, 500, 500, 500, 500};
+  counts = 5;
+  ArrowMove(command5, counts, wait5);
+  delay(1000);
+
+  char up[] = {'w'};
+  unsigned long waitUp[] = {500};
+  SimpleSkill(true, FANTASY);
+  delay(800);
+  char command6[] = {'d', 'e', 'z', 'z', 'z'};
+  unsigned long minDelay6[] = {700, 700, 2000, 300, 300};
+  unsigned long maxDelay6[] = {710, 710, 2050, 310, 310};
+  counts = 5;
+  Move(command6, counts, minDelay6, maxDelay6);
+  delay(500);
+  SlightMove(true, 3);
+  delay(300);
+  SimpleSkill(true, ROPE);
+  delay(1500);
+  ArrowMove(up, 1, waitUp);
+  delay(1000);
+
+  SimpleSkill(true, FANTASY);
+  delay(800);
+  char command7[] = {'a', 'q', 'x', 'x', 'x'};
+  Move(command7, counts, minDelay6, minDelay6);
+  delay(500);
+  SlightMove(false, 3);
+  delay(300);
+  SimpleSkill(false, ROPE);
+  delay(1500);
+  ArrowMove(up, 1, waitUp);
+  delay(1200);
+
+  char command8[] = {'e', 'w', 'x', 'x'};
+  unsigned long minDelay8[] = {700, 1500, 300, 300};
+  unsigned long maxDelay8[] = {705, 1550, 310, 310};
+  counts = 4;
+  Move(command8, counts, minDelay8, maxDelay8);
+  delay(1000);
+  for (int i = 0; i < 32; i++) {
+    SongOfTheSky(false, true, 5, 8, 30, 35);
+    delay(200);
+  }
+  
+  // ATTACK
+  delay(4000);
+  SimpleSkill(true, FANTASY);
+  delay(800);
+  Tornado(false);
+  delay(6000);
+      
+  // BACK
+  char command9[] = {'q'};
+  unsigned long minDelay9[] = {2000};
+  unsigned long maxDelay9[] = {2050};
+  Move(command9, 1, minDelay9, maxDelay9);
+  delay(500);
+
+  char command10[] = {'y', 'd', 'e'};
+  unsigned long wait10[] = {500, 500, 500};
+  counts = 3;
+  ArrowMove(command10, counts, wait10);
+  delay(2200);
+
+  ArrowMove(command10, counts, wait10);
+  delay(2200);
+
+  char single[] = {'z'};
+  unsigned long minSingle[] = {500};
+  unsigned long maxSingle[] = {550};
+  Move(single, 1, minSingle, maxSingle);
+  delay(600);
+  SlightMove(false, 5);
+  ArrowMove(up, 1, waitUp);
+  delay(2000);
+  ArrowMove(up, 1, waitUp);
+  delay(2000);
 }
 
 void Arkarium() {
@@ -955,21 +1066,6 @@ void PinkBean() {
 }
 
 // ====================== Commands ======================
-void DoubleJumpAttackA(bool direction, char jump, char attack) {
-  if (direction == true) {
-    Keyboard.press(KEY_RIGHT_ARROW);
-  } else {
-    Keyboard.press(KEY_LEFT_ARROW);
-  }
-  for (int i = 0; i < 3; i++) {
-    DoubleJump(jump);
-    delay(100);
-    Keyboard.write(attack);
-    delay(600); // 600 ~ 
-  }
-  Keyboard.releaseAll();
-}
-
 void DoubleJump(char jump) {
   Keyboard.write(jump);
   delay(100);
@@ -1077,11 +1173,13 @@ void DoubleJumpWindMove(bool direction, unsigned long minDJ, unsigned long maxDJ
 }
 
 // minWalk: 80, maxWalk: 120 (Round_min: 50, Duration: >100)
-unsigned long SongOfTheSky(bool direction, unsigned long minWalk, unsigned long maxWalk, unsigned long minDuration, unsigned long maxDuration) {
-  if (direction == true) {
-    Keyboard.press(KEY_RIGHT_ARROW);
-  } else {
-    Keyboard.press(KEY_LEFT_ARROW);
+unsigned long SongOfTheSky(bool walk, bool direction, unsigned long minWalk, unsigned long maxWalk, unsigned long minDuration, unsigned long maxDuration) {
+  if (walk) {
+    if (direction == true) {
+      Keyboard.press(KEY_RIGHT_ARROW);
+    } else {
+      Keyboard.press(KEY_LEFT_ARROW);
+    }
   }
   unsigned long distance = random(minWalk, maxWalk);
   delay(distance);
@@ -1093,23 +1191,8 @@ unsigned long SongOfTheSky(bool direction, unsigned long minWalk, unsigned long 
 
 void WalkingSongSky(bool direction, int times) {
   for (int i = 0; i < times; i++) {
-    SongOfTheSky(direction, 100, 105, 50, 55);
+    SongOfTheSky(true, direction, 100, 105, 50, 55);
   }
-}
-
-void Fountain(bool direction) {
-  if (direction == true) {
-    Keyboard.press(KEY_RIGHT_ARROW);
-  } else {
-    Keyboard.press(KEY_LEFT_ARROW);
-  }
-  delay(random(50, 100));
-  Keyboard.releaseAll();
-
-  Keyboard.press(KEY_DOWN_ARROW);
-  Keyboard.write(FOUNTAIN);
-  delay(random(70, 100));
-  Keyboard.releaseAll();
 }
 
 void Tornado(bool direction) {
@@ -1171,6 +1254,8 @@ void Move(char direction[], int counts, unsigned long minDelay[], unsigned long 
       WalkLatency(false, 200, 250);
     } else if (direction[i] == 'x') {
       WalkLatency(true, 200, 250);
+    } else if (direction[i] == 'r') {
+      SimpleSkill(true, ROPE);
     }
     delay(random(minDelay[i], maxDelay[i]));
   }
