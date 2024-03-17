@@ -273,13 +273,17 @@ void Zakum(unsigned long period) { // period: second
   delay(500);
   Keyboard.write(ITEM);
   delay(500);
-  AbsoluteMouse.moveTo(LEFT_TOP_ITEM_X, LEFT_TOP_ITEM_Y);
+  AbsoluteMouse.moveTo(LEFT_TOP_ITEM_X + 1000, LEFT_TOP_ITEM_Y);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
   AbsoluteMouse.moveTo(0, 0);
   delay(500);
   AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  Keyboard.write('1');
+  delay(500);
+  Keyboard.write(ENTER);
   delay(500);
   Keyboard.write(ITEM);
   delay(500);
