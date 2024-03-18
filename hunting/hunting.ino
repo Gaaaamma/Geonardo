@@ -31,6 +31,8 @@ const long CHAOS4_ACTIVATE_X = 0;
 const long CHAOS4_ACTIVATE_Y = 0;
 const long VONLEON_OUT_X = -22000;
 const long VONLEON_OUT_Y = -2000;
+const long PINKBEAN_ACTIVATE_X = -8000;
+const long PINKBEAN_ACTIVATE_Y = -3000;
 /**
  * 7 = 拉圖斯
  * 2 = 炎魔
@@ -84,10 +86,10 @@ void loop() {
     delay(3000);
     char c = (char)Serial.read();
     if (c == 't') { // stand for testing
-      int test_index = 14;
+      int test_index = 17;
       BossMoving(test_index);
       delay(2000);
-      Arkarium();
+      PinkBean();
 
     } else if (c == '2') { // daily boss
       Serial.print("Input start index of boss (0 ~ ");
@@ -1131,8 +1133,76 @@ void Arkarium() {
 }
 
 void PinkBean() {
+  // Move
+  // 1.1 Move to door
+  char confirm[] = {'y', 'd', 'e'};
+  unsigned long waitconfirm[] = {500, 500, 500};
+  char single[] = {'d'};
+  unsigned long mingSingle[] = {650};
+  unsigned long maxSingle[] = {655};
+  int counts = 1;
+  Move(single, counts, mingSingle, maxSingle);
+  delay(800);
 
+  // 1.2 Go into door
+  char command2[] = {'y', 'y', 'y'};
+  unsigned long wait2[] = {900, 900, 900};
+  counts = 3;
+  ArrowMove(command2, counts, wait2);
+  delay(2000);
+
+  // Boss
+  AbsoluteMouse.moveTo(PINKBEAN_ACTIVATE_X, PINKBEAN_ACTIVATE_Y);
+  delay(500);
+  // AbsoluteMouse.click(MOUSE_LEFT);
+  delay(500);
+  // ArrowMove(confirm, 3, waitconfirm);
+  delay(1000);
+
+  SimpleSkill(true, FANTASY);
+  delay(700);
+  Tornado(true);
+  delay(900);
+  Swirl(true);
+  delay(1000);
+  SongOfTheSky(true, true, 10, 15, 12000, 12050);
+  delay(2000);
+
+  char command3[] = {'d', 'd', 'd', 'd', 'a', 'a', 'a', 'a'};
+  unsigned long minDelay3[] = {700, 700, 700, 700, 700, 700, 700, 700};
+  unsigned long maxDelay3[] = {710, 710, 710, 710, 710, 710, 710, 710};
+  counts = 8;
+  Move(command3, counts, minDelay3, maxDelay3);
+  delay(800);
+
+  // Back
+  ArrowMove(confirm, 3, waitconfirm);
+  delay(2000);
+
+  char command4[] = {'q', 'q', 'q', 'd', 'd', 'x', 'x'};
+  unsigned long minDelay4[] = {700, 700, 1000, 700, 700, 700, 300};
+  unsigned long maxDelay4[] = {710, 710, 1050, 710, 710, 710, 310};
+  counts = 7;
+  Move(command4, counts, minDelay4, maxDelay4);
+  delay(500);
+  SlightMove(false, 12);
+  delay(500);
+
+  single[0] = 'w';
+  ArrowMove(single, 1, mingSingle);
+  delay(2500);
+
+  char command5[] = {'q', 'q', 'd', 'x'};
+  unsigned long minDelay5[] = {700, 1000, 700, 300};
+  unsigned long maxDelay5[] = {710, 1050, 710, 310};
+  counts = 4;
+  Move(command5, counts, minDelay5, maxDelay5);
+  delay(500);
+
+  ArrowMove(single, 1, mingSingle);
+  delay(2500);
 }
+
 
 // ====================== Commands ======================
 void DoubleJump(char jump) {
