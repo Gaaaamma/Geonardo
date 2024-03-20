@@ -128,21 +128,23 @@ void loop() {
         }
         Serial.println();
 
-        bool direction = false;
         unsigned long start = millis();
         unsigned long FrenzyStart = start;
         unsigned long BurnStart = start;
         unsigned long time = millis();
-        unsigned long base = millis();
         int second = (time-start)/1000;
         bool startUp = true;
-          
+        char notRobot[] = {'z', 'x'};
+        unsigned long minDelay[] = {300, 300};
+        unsigned long maxDelay[] = {350, 350};
+
         while (second < minutes * 60) {
           // Frenzys
           if (frenzy_on && (startUp || (time - FrenzyStart)/1000 > FRENZY_CD)) {
             FrenzyStart = millis();
-            SkillUse('f', (FrenzyStart - base) / 1000 / 60);
-
+            Move(notRobot, 2, minDelay, maxDelay);
+            SkillUse('f', (FrenzyStart - start) / 1000 / 60);
+            
             // frenzy delay
             delay(3000);
           }
@@ -150,8 +152,10 @@ void loop() {
           // Burn
           if (burn_on && (startUp || (time - BurnStart)/1000 > BURN_CD)) {
             BurnStart = millis();
-            SkillUse('b', (BurnStart - base) / 1000 / 60);
-
+            Move(notRobot, 2, minDelay, maxDelay);
+            SkillUse('b', (BurnStart - start) / 1000 / 60);
+            
+            
             // burn delay
             delay(3000);
           }
@@ -199,10 +203,14 @@ void SkillUse(char type, int minute) {
     Serial.print("|  施放輪迴: ");
     Serial.print(minute);
     Serial.println(" min");
+    SimpleSkill(FRENZY, 500);
+
   } else if (type == 'b') {
     Serial.print("|  施放燃燒: ");
     Serial.print(minute);
     Serial.println(" min");
+    SimpleSkill(BURN, 500);
+
   }
 }
 
