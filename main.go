@@ -13,7 +13,9 @@ const COMMAND_MAXLENGH = 16
 const SUPPORT_PERIOD = 5
 
 func main() {
-	// Get command from user and work
+	// Init
+	daily.MusicInit()
+
 	for {
 		command := ""
 		fmt.Print("[Geonardo] input your command: ")
@@ -31,9 +33,15 @@ func main() {
 		if command == "support" { // Test cursor movement among items is correct or not
 			daily.MapLocating()
 			for {
-				daily.PlayerDetection()
-				time.Sleep(SUPPORT_PERIOD * time.Second)
+				if daily.PlayerDetection() {
+					// Alert when there is player in the map
+					daily.Notice()
+				} else {
+					time.Sleep(SUPPORT_PERIOD * time.Second)
+				}
 			}
+		} else if command == "music" {
+			daily.Notice()
 		}
 	}
 }

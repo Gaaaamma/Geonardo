@@ -3,7 +3,13 @@ package daily
 import (
 	"Geonardo/maker"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
+	"github.com/faiface/beep"
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
 	"github.com/go-vgo/robotgo"
 )
 
@@ -11,6 +17,9 @@ var (
 	GoMapStartX, GoMapStartY, GoMapEndX, GoMapEndY     int
 	WinMapStartX, WinMapStartY, WinMapEndX, WinMapEndY int
 	MapWidth, MapHeight                                int
+	File                                               *os.File
+	streamer                                           beep.StreamSeekCloser
+	format                                             beep.Format
 )
 
 func MapLocating() {
@@ -55,6 +64,36 @@ func PlayerDetection() bool {
 	return false
 }
 
+func MusicInit() {
+	// Open the MP3 file
+	File, _ = os.Open("test.mp3")
+
+	// Decode the MP3 file
+	streamer, format, _ = mp3.Decode(File)
+
+	// Initialize the speaker
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+}
+
+func Notice() {
+	fmt.Println("start!")
+	done := make(chan bool)
+
+	// Play the audio stream
+	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+		done <- true
+	})))
+
+	// Wait for playback to finish
+	<-done
+	fmt.Println("done")
+
+	// Rewind the file to the beginning
+	_, err := File.Seek(0, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 func isPlayer(r, g, b uint8) bool {
 	return (r == 255 && g == 0 && b == 0)
 }
