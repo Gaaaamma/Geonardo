@@ -46,17 +46,20 @@ func MapLocating() {
 
 func PlayerDetection() bool {
 	maker.GetImage(WinMapStartX, WinMapStartY, MapWidth, MapHeight, "MapPosition")
-	bit := robotgo.CaptureScreen(WinMapStartY, WinMapStartY, MapWidth, MapHeight)
+	bit := robotgo.CaptureScreen(WinMapStartX, WinMapStartY, MapWidth, MapHeight)
 	rgba := robotgo.ToRGBA(bit)
 	robotgo.FreeBitmap(bit)
 
-	for w := 0; w < MapWidth; w++ {
-		for h := 0; h < MapHeight; h++ {
+	for h := 0; h < MapHeight; h++ {
+		for w := 0; w < MapWidth; w++ {
 			r, g, b, _ := rgba.At(w, h).RGBA()
 			r8 := (uint8)(r >> 8)
 			g8 := (uint8)(g >> 8)
 			b8 := (uint8)(b >> 8)
+			// fmt.Printf("[%d,%d] = (%d,%d,%d)\n", h, w, r8, g8, b8)
 			if isPlayer(r8, g8, b8) {
+				fmt.Println(r8, g8, b8)
+				fmt.Println("Find player")
 				return true
 			}
 		}
