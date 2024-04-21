@@ -108,7 +108,7 @@ func GetImage(x, y, width, height int, name string) {
 	bit := robotgo.CaptureScreen(x, y, width, height)
 	defer robotgo.FreeBitmap(bit)
 	robotgo.SaveBitmap(bit, fmt.Sprintf("%s.png", name))
-	// ShowRGBA(robotgo.ToRGBA(bit), width, height)
+	ShowRGBA(robotgo.ToRGBA(bit), width, height)
 }
 
 func LeonardoEcho(leonardo *serial.Port, command string, data []byte) {
