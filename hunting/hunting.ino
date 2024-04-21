@@ -17,8 +17,8 @@ const long BOSS_MOVE_Y = 1500;
 const long BOSS_NEXT_PAGE_X = -30000;
 const long BOSS_NEXT_PAGE_Y = 4000;
 const long BOSS_DISTANCE_Y = 2000;
-const int BOSS_COUNTS = 12;
-const int BOSS_LIST[BOSS_COUNTS] = {7, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 17};
+const int BOSS_COUNTS = 11;
+const int BOSS_LIST[BOSS_COUNTS] = {7, 2, 3, 4, 8, 9, 10, 11, 12, 14, 17};
 const long LEFT_TOP_ITEM_X = -31500;
 const long LEFT_TOP_ITEM_Y = -28000;
 const long MAGNUS_OUT_SEAT_X = -26500;
@@ -32,7 +32,7 @@ const long CHAOS4_ACTIVATE_Y = 0;
 const long VONLEON_OUT_X = -22000;
 const long VONLEON_OUT_Y = -2000;
 const long PINKBEAN_ACTIVATE_X = -8000;
-const long PINKBEAN_ACTIVATE_Y = -3000;
+const long PINKBEAN_ACTIVATE_Y = 2000;
 /**
  * 7 = 拉圖斯
  * 2 = 炎魔
@@ -45,7 +45,6 @@ const long PINKBEAN_ACTIVATE_Y = -3000;
  * 17 = 皮卡啾
  * */ 
 
-const unsigned long WHEEL_CD = 630;
 const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
@@ -53,25 +52,11 @@ const char SONG_SKY = 'a';
 const char ROPE = '9';
 const char ATTACK = '0'; // KEYBOARD_DELETE
 
-const char FOUNTAIN = 'z';
-const unsigned long FOUNTAIN_CD = 58; 
 const char TORNADO = 'b';
-const unsigned long TORNADO_CD = 20;
-const char MONSOON = 'q';
-const unsigned long MONSOON_CD = 24;
 const char SWIRL = 'e';
-const unsigned long SWIRL_CD = 25;
 const char FANTASY = ' ';
-const unsigned long FANTASY_CD = 8;
 const char BIRD = 'v';
-const unsigned long BIRD_CD = 25;
 const char C2F = 'g';
-const unsigned long MONEY_CD = 90; 
-
-const int BUFF_COUNTS = 5;
-const char BUFF[5] = {'2', '3', C2F, 'c', 'x'};
-const String BUFF_NAME[5] = {"Storm", "Glory", "Shilff", "Grandpa", "Critical"};
-unsigned long BUFF_CD[5] = {120, 120, 90, 150, 120};
 
 void setup() {
   // put your setup code here, to run once:
@@ -191,7 +176,7 @@ void BossScript(int index) {
     break;
     
   case 13:
-    Horntail();
+    // Horntail();
     break;
     
   case 14:
@@ -944,121 +929,6 @@ void VonLeon() {
   delay(2500);
 }
 
-void Horntail() {
-  // Move
-  // 1.1 Move to door
-  char command1[] = {'e', 's', 's', 's'};
-  unsigned long minDelay1[] = {700, 650, 650, 650};
-  unsigned long maxDelay1[] = {710, 655, 655, 655};
-  int counts = 4;
-  Move(command1, counts, minDelay1, maxDelay1);
-  delay(800);
-
-  // 1.2 Go into door
-  char command2[] = {'y'};
-  unsigned long wait2[] = {700};
-  counts = 1;
-  ArrowMove(command2, counts, wait2);
-  delay(2000);
-
-  char command3[] = {'d', 'd', 'd'};
-  unsigned long minDelay3[] = {700, 700, 700};
-  unsigned long maxDelay3[] = {710, 710, 710};
-  counts = 3;
-  Move(command3, counts, minDelay3, maxDelay3);
-  delay(500);
-
-  char command4[] = {'y', 'd', 'e'};
-  unsigned long wait4[] = {500, 500, 500};
-  counts = 3;
-  ArrowMove(command4, counts, wait4);
-  delay(1000);
-
-  counts = 3;
-  Move(command3, counts, minDelay3, maxDelay3);
-  delay(500);
-
-  char command5[] = {'y', 'y', 's', 's', 'e'};
-  unsigned long wait5[] = {500, 500, 500, 500, 500};
-  counts = 5;
-  ArrowMove(command5, counts, wait5);
-  delay(1000);
-
-  char up[] = {'w'};
-  unsigned long waitUp[] = {500};
-  SimpleSkill(true, FANTASY);
-  delay(800);
-  char command6[] = {'d', 'e', 'z', 'z', 'z'};
-  unsigned long minDelay6[] = {700, 700, 2000, 300, 300};
-  unsigned long maxDelay6[] = {710, 710, 2050, 310, 310};
-  counts = 5;
-  Move(command6, counts, minDelay6, maxDelay6);
-  delay(500);
-  SlightMove(true, 3);
-  delay(300);
-  SimpleSkill(true, ROPE);
-  delay(1500);
-  ArrowMove(up, 1, waitUp);
-  delay(1000);
-
-  SimpleSkill(true, FANTASY);
-  delay(800);
-  char command7[] = {'a', 'q', 'x', 'x', 'x'};
-  Move(command7, counts, minDelay6, minDelay6);
-  delay(500);
-  SlightMove(false, 3);
-  delay(300);
-  SimpleSkill(false, ROPE);
-  delay(1500);
-  ArrowMove(up, 1, waitUp);
-  delay(1200);
-
-  char command8[] = {'e', 'w', 'x', 'x'};
-  unsigned long minDelay8[] = {700, 1500, 300, 300};
-  unsigned long maxDelay8[] = {705, 1550, 310, 310};
-  counts = 4;
-  Move(command8, counts, minDelay8, maxDelay8);
-  delay(1000);
-  for (int i = 0; i < 32; i++) {
-    SongOfTheSky(false, true, 5, 8, 30, 35);
-    delay(200);
-  }
-  
-  // ATTACK
-  delay(4000);
-  SimpleSkill(true, FANTASY);
-  delay(800);
-  Tornado(false);
-  delay(6000);
-      
-  // BACK
-  char command9[] = {'q'};
-  unsigned long minDelay9[] = {2000};
-  unsigned long maxDelay9[] = {2050};
-  Move(command9, 1, minDelay9, maxDelay9);
-  delay(500);
-
-  char command10[] = {'y', 'd', 'e'};
-  unsigned long wait10[] = {500, 500, 500};
-  counts = 3;
-  ArrowMove(command10, counts, wait10);
-  delay(2200);
-
-  ArrowMove(command10, counts, wait10);
-  delay(2200);
-
-  char single[] = {'z'};
-  unsigned long minSingle[] = {500};
-  unsigned long maxSingle[] = {550};
-  Move(single, 1, minSingle, maxSingle);
-  delay(600);
-  SlightMove(false, 5);
-  ArrowMove(up, 1, waitUp);
-  delay(2000);
-  ArrowMove(up, 1, waitUp);
-  delay(2000);
-}
-
 void Arkarium() {
   // Move
   // 1.1 Move to door
@@ -1154,9 +1024,9 @@ void PinkBean() {
   // Boss
   AbsoluteMouse.moveTo(PINKBEAN_ACTIVATE_X, PINKBEAN_ACTIVATE_Y);
   delay(500);
-  // AbsoluteMouse.click(MOUSE_LEFT);
+  AbsoluteMouse.click(MOUSE_LEFT);
   delay(500);
-  // ArrowMove(confirm, 3, waitconfirm);
+  ArrowMove(confirm, 3, waitconfirm);
   delay(1000);
 
   SimpleSkill(true, FANTASY);

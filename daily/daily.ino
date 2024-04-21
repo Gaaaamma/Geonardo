@@ -15,12 +15,14 @@ const long GUIDE_DISTANCE_X = 1650;
 const long MOVE_BOUnD_MAX = 32767;
 const long MOVE_BOUND_MIN = -32767;
 
-const unsigned long WHEEL_CD = 630;
+const unsigned long WHEEL_CD = 930;
 const char JUMP = 'f';
 const char WIND_MOVE = 'w';
 const char ELF_SHIELD = 'd';
 const char SONG_SKY = 'a';
 const char ROPE = 't';
+const char FRENZY = '8';
+const unsigned long FRENZY_CD = 300;
 
 const char FOUNTAIN = 'z';
 const unsigned long FOUNTAIN_CD = 58; 
@@ -92,7 +94,8 @@ void loop() {
       }
 
     } else if (c == '2') {
-      
+      Battle(WHEEL_CD, 0, true, false);
+
     } else if (c == '0') {
       Battle(WHEEL_CD, 0, true, true);
 
@@ -156,6 +159,7 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
 
   bool direction = false;
   unsigned long start = millis();
+  unsigned long FrenzyStart = start;
   unsigned long TornadoStart = start;
   unsigned long SwirlStart = start;
   unsigned long MonsoonStart = start;
@@ -173,7 +177,19 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
     bool underAttack = false;
     SongOfTheSky(direction, 10, 20, 500, 1000);
     direction = !direction;
-    
+
+    // Frenzy
+    time = millis();
+    second = (time-start)/1000;
+    if (startUp || (time-FrenzyStart)/1000 > 0) {
+      SimpleSkill(direction, FRENZY);      
+      FrenzyStart = millis();
+      delay(random(700, 1000));
+      
+      Serial.print(second);
+      Serial.println("Frenzy");
+    }
+
     // Fantasy
     if (startUp || (time-FantasyStart)/1000 > FANTASY_CD) {
       SimpleSkill(direction, FANTASY);

@@ -155,7 +155,6 @@ void loop() {
             Move(notRobot, 2, minDelay, maxDelay);
             SkillUse('b', (BurnStart - start) / 1000 / 60);
             
-            
             // burn delay
             delay(3000);
           }
