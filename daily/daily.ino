@@ -60,7 +60,7 @@ void loop() {
       Serial.println("Input 'a' for 6 tasks, 'b' for 9 tasks");
       WaitInput();
       char next = Serial.read();
-      unsigned long BATTLE_TIME[] = {35, 35, 35, 35, 35, 35, 120, 120, 120};
+      unsigned long BATTLE_TIME[] = {30, 30, 30, 30, 30, 30, 90, 90, 120};
       int GUIDE_DAILY_TASKS = 9; // daily
 
       if (next == 'a') {
