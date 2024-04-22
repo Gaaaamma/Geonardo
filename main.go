@@ -33,7 +33,9 @@ func main() {
 		if command == "support" { // Test cursor movement among items is correct or not
 			daily.MapLocating()
 			for {
-				if daily.PlayerDetection() {
+				if daily.WheelDetection() {
+					daily.Notice()
+				} else if daily.PlayerDetection() {
 					// Alert when there is player in the map
 					daily.Notice()
 				} else {

@@ -99,7 +99,7 @@ func ShowRGBA(rgba *image.RGBA, width, height int) {
 			r8 := (uint8)(r >> 8)
 			g8 := (uint8)(g >> 8)
 			b8 := (uint8)(b >> 8)
-			fmt.Printf("[%d,%d] = (%d,%d,%d)\n", x, y, r8, g8, b8)
+			fmt.Printf("[%d,%d] = (%d,%d,%d)\n", y, x, r8, g8, b8)
 		}
 	}
 }
