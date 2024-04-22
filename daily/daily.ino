@@ -60,10 +60,14 @@ void loop() {
       Serial.println("Input 'a' for 6 tasks, 'b' for 9 tasks");
       WaitInput();
       char next = Serial.read();
-      unsigned long BATTLE_TIME[] = {70, 70, 70, 70, 70, 70, 150, 150, 150};
+      unsigned long BATTLE_TIME[] = {35, 35, 35, 35, 35, 35, 120, 120, 120};
       int GUIDE_DAILY_TASKS = 9; // daily
 
       if (next == 'a') {
+        BATTLE_TIME[0] = 70;
+        BATTLE_TIME[1] = 70;
+        BATTLE_TIME[2] = 70;
+        BATTLE_TIME[3] = 70;
         BATTLE_TIME[4] = 100;
         BATTLE_TIME[5] = 200;
         GUIDE_DAILY_TASKS = 6;
@@ -181,7 +185,7 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
     // Frenzy
     time = millis();
     second = (time-start)/1000;
-    if (startUp || (time-FrenzyStart)/1000 > 0) {
+    if (startUp || (time-FrenzyStart)/1000 > FRENZY_CD) {
       SimpleSkill(direction, FRENZY);      
       FrenzyStart = millis();
       delay(random(700, 1000));
