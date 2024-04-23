@@ -11,6 +11,7 @@ import (
 
 const COMMAND_MAXLENGH = 16
 const SUPPORT_PERIOD = 5
+const PLAYER_EXIST_TIMES = 4
 
 func main() {
 	// Init
@@ -31,14 +32,21 @@ func main() {
 		}
 
 		if command == "support" { // Test cursor movement among items is correct or not
+			playerTime := 0
 			daily.MapLocating()
 			for {
 				if daily.WheelDetection() {
 					daily.Notice()
 				} else if daily.PlayerDetection() {
-					// Alert when there is player in the map
-					daily.Notice()
+					playerTime += 1
+					if playerTime >= PLAYER_EXIST_TIMES {
+						// Alert when there is player in the map over PLAYER_EXIST_TIMES
+						daily.Notice()
+					} else {
+						time.Sleep(SUPPORT_PERIOD * time.Second)
+					}
 				} else {
+					playerTime = 0
 					time.Sleep(SUPPORT_PERIOD * time.Second)
 				}
 			}
