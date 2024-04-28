@@ -44,6 +44,8 @@ const char BUFF[5] = {'2', '3', C2F, 'c', 'x'};
 const String BUFF_NAME[5] = {"Storm", "Glory", "Shilff", "Grandpa", "Critical"};
 unsigned long BUFF_CD[5] = {120, 120, 90, 150, 120};
 
+int hunting_graph = 3; // 3: alley2, 4: spring1
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -97,13 +99,60 @@ void loop() {
         delay(3000);
       }
 
-    } else if (c == '2') {
+    } else if (c == '2') { // Hunting without money
       Battle(WHEEL_CD, 0, true, false);
 
-    } else if (c == '0') {
+    } else if (c == 'f') { // Frenzy only
+        Serial.print("Input time: (mins) ");
+        WaitInput();
+        int minutes = Serial.parseInt();
+        ConsumeInput();
+        Serial.println(minutes);
+        PlayFrenzy(minutes);
+
+    } else if (c == 'h') { // Hunting
+      Serial.print("Input graph: (3: alley2 / 4: spring1) ");
+      WaitInput();
+      hunting_graph = Serial.parseInt();
+      ConsumeInput();
+      Serial.println(hunting_graph);
       Battle(WHEEL_CD, 0, true, true);
 
     }
+  }
+}
+
+void PlayFrenzy(int minutes) {
+  unsigned long start = millis();
+  unsigned long FrenzyStart = start;
+  unsigned long BurnStart = start;
+  unsigned long time = millis();
+  int second = (time-start)/1000;
+  bool startUp = true;
+  char notRobot[] = {'z', 'x'};
+  unsigned long minDelay[] = {300, 300};
+  unsigned long maxDelay[] = {350, 350};
+
+  while (second < minutes * 60) {
+    // Frenzys
+    if (startUp || (time - FrenzyStart)/1000 > FRENZY_CD) {
+      FrenzyStart = millis();
+      Move(notRobot, 2, minDelay, maxDelay);
+      SimpleSkill(true, FRENZY);
+      Serial.print("Play frenzy at time: ");
+      Serial.print(second / 60);
+      Serial.print("min ");
+      Serial.print(second % 60);
+      Serial.println("sec");
+      // frenzy delay
+      delay(3000);
+      
+    }
+
+    // time set
+    time = millis();
+    second = (time-start)/1000;
+    startUp = false;
   }
 }
 
@@ -220,6 +269,10 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
     time = millis();
     second = (time-start)/1000;
     if (startUp || (time-SwirlStart)/1000 > SWIRL_CD) {
+      if (hunting_graph == 4) {
+        // spring1 only use swirl with direction true
+        direction = true;
+      }
       Swirl(direction);
       SwirlStart = millis();
       delay(random(800, 1000));
@@ -292,10 +345,16 @@ void Battle(unsigned long period, int preMove, bool useFountain, bool collectMon
     second = (time-start)/1000;
     if (startUp || (underAttack && (time-MoneyStart)/1000 > MONEY_CD)) {
       if (collectMoney) {
-      // Collect money
+        // Collect money
+        if (hunting_graph == 3) {
+          CollectMoney_alley2();
+        } else if (hunting_graph == 4) {
+          CollectMoney_spring1();
+        } else {
+          CollectMoney_alley2();
+        }
       // CollectMoney_2_6();
       // CollectMoney_library4();
-      CollectMoney_alley2();
       }
       MoneyStart = millis();
     }
@@ -697,9 +756,23 @@ void CollectMoneyA_2_6() {
   Move(commands, 6, minDelay, maxDelay);
 }
 
+void CollectMoney_spring1() {
+  MoveToFountainA_library4();
+  delay(800);
+  char commands[] = {'s', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'w', 'd', 'd', 'e', 'x'};
+  unsigned long minDelay[] = {900, 580, 580, 580, 580, 580, 580, 580, 700, 700, 1000, 650, 300};
+  unsigned long maxDelay[] = {1000, 600, 600, 600, 600, 600, 600, 600, 800, 800, 1100, 700, 320};
+  Move(commands, 13, minDelay, maxDelay);
+}
+
 /**********************************/
 void WaitInput() {
   for (;Serial.available() <= 0;) {
     // Waiting input
+  }
+}
+void ConsumeInput() {
+  while (Serial.available()  > 0) {
+    char c = Serial.read();
   }
 }
